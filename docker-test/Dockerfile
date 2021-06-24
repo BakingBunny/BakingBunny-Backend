@@ -4,12 +4,11 @@ FROM node:14
 #create app directory
 WORKDIR /usr/scr/app
 
-RUN npm install
-
 COPY package*.json ./
-
 #To bundle app's source code inside the Docker image
-#COPY . .
+COPY . .
+
+RUN npm install
 
 EXPOSE 8080
 
