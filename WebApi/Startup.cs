@@ -31,9 +31,14 @@ namespace WebApiCrud
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddScoped<IProductRepository, ProductRepository>();
-            //services.AddDbContext<BakingbunnyContext>();
+            services.AddDbContext<BakingbunnyContext>();
+#if(DEBUG)
             services.AddDbContext<BakingbunnyContext>(options =>
-                   options.UseMySql(Configuration.GetConnectionString("BakingBunnyDB"), Microsoft.EntityFrameworkCore.ServerVersion.Parse("8.0.25-mysql")));
+                options.UseMySql(Configuration.GetConnectionString("localBakingBunnyDB"), Microsoft.EntityFrameworkCore.ServerVersion.Parse("8.0.25-mysql")));
+#else
+            services.AddDbContext<BakingbunnyContext>(options =>
+                options.UseMySql(Configuration.GetConnectionString("prodBakingBunnyDB"), Microsoft.EntityFrameworkCore.ServerVersion.Parse("8.0.25-mysql")));
+#endif
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {

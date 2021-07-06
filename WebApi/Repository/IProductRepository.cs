@@ -8,7 +8,10 @@ namespace WebApiCrud.Repository
 {
     public interface IProductRepository
     {
-        Task<IEnumerable<Product>> GetAll();
-        Task<Product> Get(int id);
+        List<Product> GetAll();
+        Product GetProductById(int id);
+
+        List<Product> GetCakes();
+        List<Product> GetDacquoises();
     }
 }

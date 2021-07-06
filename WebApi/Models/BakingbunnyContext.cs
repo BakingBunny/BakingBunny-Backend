@@ -2,6 +2,7 @@
 using System.Configuration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.Extensions.Configuration;
 
 #nullable disable
 
@@ -30,9 +31,18 @@ namespace WebApiCrud.Models
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
+            IConfigurationRoot configuration = new ConfigurationBuilder()
+                .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
+                .AddJsonFile("appsettings.json")
+                .Build();
+
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseMySql("Name=BakingBunnyDB", Microsoft.EntityFrameworkCore.ServerVersion.Parse("8.0.25-mysql"));
+#if (DEBUG)
+                optionsBuilder.UseMySql(configuration.GetConnectionString("localBakingBunnyDB"), Microsoft.EntityFrameworkCore.ServerVersion.Parse("8.0.25-mysql"));
+#else
+                optionsBuilder.UseMySql(configuration.GetConnectionString("prodBakingBunnyDB"), Microsoft.EntityFrameworkCore.ServerVersion.Parse("8.0.25-mysql"));
+#endif
             }
         }
 

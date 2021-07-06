@@ -21,15 +21,27 @@ namespace WebApiCrud.Controllers
         }
 
         [HttpGet]
-        public async Task<IEnumerable<Product>> GetAllProducts ()
+        public List<Product> GetAllProducts ()
         {
-            return await _productRepository.GetAll();
+            return _productRepository.GetAll();
+        }
+
+        [HttpGet("cake")]
+        public List<Product> GetCakes()
+        {
+            return _productRepository.GetCakes();
+        }
+
+        [HttpGet("dacq")]
+        public List<Product> GetDacquoises()
+        {
+            return _productRepository.GetDacquoises();
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Product>> GetProduct(int id)
+        public Product GetProductById(int id)
         {
-            return await _productRepository.Get(id);
+            return _productRepository.GetProductById(id);
         }
     }
 }

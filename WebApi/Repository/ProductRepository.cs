@@ -15,14 +15,24 @@ namespace WebApiCrud.Repository
         {
             _bakingbunnyContext = bakingbunnyContext;
         }
-        public async Task<Product> Get(int id)
+        public Product GetProductById(int id)
         {
-            return await _bakingbunnyContext.Products.FindAsync(id);
+            return _bakingbunnyContext.Products.Where(s => s.Id == id).FirstOrDefault<Product>();
         }
 
-        public async Task<IEnumerable<Product>> GetAll()
+        public List<Product> GetAll()
         {
-            return await _bakingbunnyContext.Products.ToListAsync();
+            return _bakingbunnyContext.Products.ToList();
+        }
+
+        public List<Product> GetCakes()
+        {
+            return _bakingbunnyContext.Products.Where(s => s.CategoryId == 1).ToList();
+        }
+
+        public List<Product> GetDacquoises()
+        {
+            return _bakingbunnyContext.Products.Where(s => s.CategoryId == 2).ToList();
         }
     }
 }
