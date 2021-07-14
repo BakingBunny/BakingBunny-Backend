@@ -4,8 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using WebApiCrud.Models;
-using WebApiCrud.Repository;
+using WebApi.Models;
+using WebApi.Repository;
 
 namespace WebApiCrud.Controllers
 {
@@ -20,11 +20,11 @@ namespace WebApiCrud.Controllers
             _productRepository = productRepository;
         }
 
-        [HttpGet]
-        public List<Product> GetAllProducts ()
-        {
-            return _productRepository.GetAll();
-        }
+        //[HttpGet]
+        //public List<Product> GetAllProducts ()
+        //{
+        //    return _productRepository.GetAll();
+        //}
 
         [HttpGet("cake")]
         public List<Product> GetCakes()
@@ -38,10 +38,28 @@ namespace WebApiCrud.Controllers
             return _productRepository.GetDacquoises();
         }
 
+        [HttpGet("dacqCombo")]
+        public List<Product> GetDacquoisesCombo()
+        {
+            return _productRepository.GetDacquoisesCombo();
+        }
+
         [HttpGet("{id}")]
         public Product GetProductById(int id)
         {
             return _productRepository.GetProductById(id);
+        }
+
+        [HttpPost("Order")]
+        public void CreateOrder([FromBody] OrderDetail orderDetail)
+        {
+            _productRepository.CreateOrder(orderDetail);
+        }
+
+        [HttpPost("CustomOrder")]
+        public void CreateCustomOrder([FromBody] CustomOrderDetail customOrderDetail)
+        {
+            _productRepository.CreateCustomOrder(customOrderDetail);
         }
     }
 }

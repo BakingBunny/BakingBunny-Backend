@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 #nullable disable
 
-namespace WebApiCrud.Models
+namespace WebApi.Models
 {
     public partial class Customorder
     {

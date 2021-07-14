@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 #nullable disable
 
-namespace WebApiCrud.Models
+namespace WebApi.Models
 {
     public partial class Orderlist
     {
@@ -14,9 +14,9 @@ namespace WebApiCrud.Models
         public ulong Delivery { get; set; }
         public DateTime OrderDate { get; set; }
         public int UserId { get; set; }
-        public int SaleItemId { get; set; }
+        //public int SaleItemId { get; set; }
 
-        public virtual Saleitem SaleItem { get; set; }
+        //public virtual Saleitem SaleItem { get; set; }
         public virtual User User { get; set; }
     }
 }

@@ -12,11 +12,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using WebApiCrud.Repository;
-using WebApiCrud.Models;
+using WebApi.Repository;
+using WebApi.Models;
 using System.Configuration;
 
-namespace WebApiCrud
+namespace WebApi
 {
     public class Startup
     {
@@ -32,8 +32,10 @@ namespace WebApiCrud
         {
             services.AddScoped<IProductRepository, ProductRepository>();
             services.AddDbContext<BakingbunnyContext>();
-#if(DEBUG)
+            string dfd = Configuration.GetConnectionString("localBakingBunnyDB");
+#if (DEBUG)
             services.AddDbContext<BakingbunnyContext>(options =>
+                //options.UseMySql(Configuration.GetConnectionString("localBakingBunnyDB"), Microsoft.EntityFrameworkCore.ServerVersion.Parse("8.0.25-mysql")));
                 options.UseMySql(Configuration.GetConnectionString("localBakingBunnyDB"), Microsoft.EntityFrameworkCore.ServerVersion.Parse("8.0.25-mysql")));
 #else
             services.AddDbContext<BakingbunnyContext>(options =>
@@ -43,6 +45,7 @@ namespace WebApiCrud
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Baking Bunny API", Version = "v1" });
+                //c.ResolveConflictingActions(s => s.First());
             });
 
 
@@ -51,11 +54,13 @@ namespace WebApiCrud
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            var configBuilder = new ConfigurationBuilder();
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                configBuilder.AddUserSecrets<UserSecretConfig>();
             }
-
+            
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {

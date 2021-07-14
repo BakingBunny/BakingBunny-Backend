@@ -6,10 +6,10 @@ This repository shows the backend (.NET Core 5 Web API) for Baking Bunny Project
 
 ### Update DB connection string
 
-Open 'appsettings.json' and update DB connection parameters accordingly.
+Modify 'appsettings.json' and update DB connection parameters accordingly.
 
 ```
-"server=localhost;user id=root;password=bakingbunny;port=3306;database=bakingbunny;"
+"server=<em>IP address</em>;user id=<em>userId</em>;password=<em>password</em>;port=3306;database=<em>databasename</em>;"
 ```
 
 ### API version documentation
