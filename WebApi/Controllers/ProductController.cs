@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using WebApi.Models;
 using WebApi.Repository;
+using WebApi.Services;
 
 namespace WebApiCrud.Controllers
 {
@@ -14,17 +15,19 @@ namespace WebApiCrud.Controllers
     public class ProductController : ControllerBase
     {
         private readonly IProductRepository _productRepository;
+        private readonly IMailService _mailService;
 
-        public ProductController(IProductRepository productRepository)
+        public ProductController(IProductRepository productRepository, IMailService mailService)
         {
             _productRepository = productRepository;
+            _mailService = mailService;
         }
 
-        //[HttpGet]
-        //public List<Product> GetAllProducts ()
-        //{
-        //    return _productRepository.GetAll();
-        //}
+        [HttpGet]
+        public List<Product> GetAllProducts()
+        {
+            return _productRepository.GetAll();
+        }
 
         [HttpGet("cake")]
         public List<Product> GetCakes()
@@ -57,9 +60,13 @@ namespace WebApiCrud.Controllers
         }
 
         [HttpPost("CustomOrder")]
-        public void CreateCustomOrder([FromBody] CustomOrderDetail customOrderDetail)
+        public void CreateCustomOrder([FromBody] CustomOrder customOrder)
         {
-            _productRepository.CreateCustomOrder(customOrderDetail);
+#if(!DEBUG)
+            _productRepository.CreateCustomOrder(customOrder);
+#endif
+            _mailService.SendInternalEmailAsync(customOrder);
+            _mailService.SendEmailToClientAsync(customOrder);
         }
     }
 }

@@ -23,10 +23,10 @@ namespace WebApi.Repository
             return _bakingbunnyContext.Product.Where(s => s.Id == id).FirstOrDefault<Product>();
         }
 
-        //public List<Product> GetAll()
-        //{
-        //    return _bakingbunnyContext.Products.ToList();
-        //}
+        public List<Product> GetAll()
+        {
+            return _bakingbunnyContext.Product.ToList();
+        }
 
         public List<Product> GetCakes()
         {
@@ -98,40 +98,39 @@ namespace WebApi.Repository
             }
         }
 
-        public void CreateCustomOrder([FromBody] CustomOrderDetail customOrderDetail)
+        public void CreateCustomOrder([FromBody] CustomOrder customOrder)
         {
             using (var dbContext = new BakingbunnyContext())
             {
                 User user = new User()
                 {
-                    Firstname = customOrderDetail.user.Firstname,
-                    Lastname = customOrderDetail.user.Lastname,
-                    Email = customOrderDetail.user.Email,
-                    Phone = customOrderDetail.user.Phone,
-                    Address = customOrderDetail.user.Address,
-                    City = customOrderDetail.user.City,
-                    PostalCode = customOrderDetail.user.PostalCode,
+                    Firstname = customOrder.User.Firstname,
+                    Lastname = customOrder.User.Lastname,
+                    Email = customOrder.User.Email,
+                    Phone = customOrder.User.Phone,
+                    Address = customOrder.User.Address,
+                    City = customOrder.User.City,
+                    PostalCode = customOrder.User.PostalCode,
                 };
                 dbContext.Add(user);
                 dbContext.SaveChanges();
 
-                Fruit chosenFruit = _bakingbunnyContext.Fruit.Where(s => s.FruitName.Equals(customOrderDetail.fruit.FruitName)).FirstOrDefault();
-                Size chosenSize = _bakingbunnyContext.Size.Where(s => s.SizeName.Equals(customOrderDetail.size.SizeName)).FirstOrDefault();
-                Caketype chosenCakeType = _bakingbunnyContext.Caketype.Where(s => s.Type.Equals(customOrderDetail.caketype.Type)).FirstOrDefault();
+                Fruit chosenFruit = _bakingbunnyContext.Fruit.Where(s => s.FruitName.Equals(customOrder.Fruit.FruitName)).FirstOrDefault();
+                Size chosenSize = _bakingbunnyContext.Size.Where(s => s.SizeName.Equals(customOrder.Size.SizeName)).FirstOrDefault();
+                Caketype chosenCakeType = _bakingbunnyContext.Caketype.Where(s => s.Type.Equals(customOrder.CakeType.Type)).FirstOrDefault();
 
-                Customorder customorder = new Customorder()
+                dbContext.Add(new CustomOrder()
                 {
-                    Name = customOrderDetail.name,
-                    ExampleImage = customOrderDetail.exampleImage,
-                    Message = customOrderDetail.message,
-                    Comment = customOrderDetail.comment,
+                    Name = customOrder.Name,
+                    ExampleImage = customOrder.ExampleImage,
+                    Message = customOrder.Message,
+                    Comment = customOrder.Comment,
                     UserId = user.Id,
                     SizeId = chosenSize.Id,
                     FruitId = chosenFruit.Id,
                     CakeTypeId = chosenCakeType.Id,
-                };
+                });
 
-                dbContext.Add(customorder);
                 dbContext.SaveChanges();
             }
         }

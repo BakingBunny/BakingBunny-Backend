@@ -9,7 +9,7 @@ namespace WebApi.Repository
 {
     public interface IProductRepository
     {
-        //List<Product> GetAll();
+        List<Product> GetAll();
         Product GetProductById(int id);
 
         List<Product> GetCakes();
@@ -17,6 +17,6 @@ namespace WebApi.Repository
         List<Product> GetDacquoisesCombo();
         void CreateOrder([FromBody] OrderDetail orderDetail);
 
-        void CreateCustomOrder([FromBody] CustomOrderDetail customOrderDetail);
+        void CreateCustomOrder([FromBody] CustomOrder customOrder);
     }
 }

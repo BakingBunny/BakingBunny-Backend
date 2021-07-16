@@ -15,6 +15,8 @@ using System.Threading.Tasks;
 using WebApi.Repository;
 using WebApi.Models;
 using System.Configuration;
+using WebApi.Settings;
+using WebApi.Services;
 
 namespace WebApi
 {
@@ -31,6 +33,8 @@ namespace WebApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddScoped<IProductRepository, ProductRepository>();
+            //services.AddScoped<IMailService, MailService>();
+            services.AddTransient<IMailService, MailService>();
             services.AddDbContext<BakingbunnyContext>();
             string dfd = Configuration.GetConnectionString("localBakingBunnyDB");
 #if (DEBUG)
@@ -48,7 +52,7 @@ namespace WebApi
                 //c.ResolveConflictingActions(s => s.First());
             });
 
-
+            services.Configure<MailSettings>(Configuration.GetSection("MailSettings"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
