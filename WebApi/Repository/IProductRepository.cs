@@ -10,11 +10,9 @@ namespace WebApi.Repository
     public interface IProductRepository
     {
         List<Product> GetAll();
-        Product GetProductById(int id);
 
         List<Product> GetCakes();
         List<Product> GetDacquoises();
-        List<Product> GetDacquoisesCombo();
         void CreateOrder([FromBody] OrderDetail orderDetail);
 
         void CreateCustomOrder([FromBody] CustomOrder customOrder);

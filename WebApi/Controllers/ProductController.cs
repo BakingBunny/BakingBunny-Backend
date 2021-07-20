@@ -23,12 +23,6 @@ namespace WebApiCrud.Controllers
             _mailService = mailService;
         }
 
-        [HttpGet]
-        public List<Product> GetAllProducts()
-        {
-            return _productRepository.GetAll();
-        }
-
         [HttpGet("cake")]
         public List<Product> GetCakes()
         {
@@ -39,18 +33,6 @@ namespace WebApiCrud.Controllers
         public List<Product> GetDacquoises()
         {
             return _productRepository.GetDacquoises();
-        }
-
-        [HttpGet("dacqCombo")]
-        public List<Product> GetDacquoisesCombo()
-        {
-            return _productRepository.GetDacquoisesCombo();
-        }
-
-        [HttpGet("{id}")]
-        public Product GetProductById(int id)
-        {
-            return _productRepository.GetProductById(id);
         }
 
         [HttpPost("Order")]

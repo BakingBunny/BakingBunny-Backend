@@ -18,32 +18,38 @@ namespace WebApi.Repository
         {
             _bakingbunnyContext = bakingbunnyContext;
         }
-        public Product GetProductById(int id)
-        {
-            return _bakingbunnyContext.Product.Where(s => s.Id == id).FirstOrDefault<Product>();
-        }
 
+        /// <summary>
+        /// Get all products
+        /// </summary>
+        /// <returns>List<Product></returns>
         public List<Product> GetAll()
         {
-            return _bakingbunnyContext.Product.ToList();
+            return _bakingbunnyContext.Product.Where(s => s.Active == 1).ToList();
         }
 
+        /// <summary>
+        /// Retrieve all active cake products
+        /// </summary>
+        /// <returns>List<Product></returns>
         public List<Product> GetCakes()
         {
-            return _bakingbunnyContext.Product.Where(s => s.CategoryId == 1).ToList();
+            return _bakingbunnyContext.Product.Where(s => s.CategoryId == 1).Where(s => s.Active == 1).ToList();
         }
 
+        /// <summary>
+        /// Retrieve all active dacquoise products
+        /// </summary>
+        /// <returns>List<Product></returns>
         public List<Product> GetDacquoises()
         {
-            return _bakingbunnyContext.Product.Where(s => s.CategoryId == 2).ToList();
+            return _bakingbunnyContext.Product.Where(s => s.CategoryId == 2).Where(s => s.Active == 1).ToList();
         }
 
-        public List<Product> GetDacquoisesCombo()
-        {
-            int [] dacquoises = new int [] { 11, 13, 18, 23, 24, 29 };
-            return _bakingbunnyContext.Product.Where(s => s.CategoryId == 2).Where(s => dacquoises.Contains(s.Id)).ToList();
-        }
-
+        /// <summary>
+        /// To faciliate POST method CreateOrder.
+        /// </summary>
+        /// <param name="orderDetail">OrderDetail class contains all necessary objects to accommodate regular cake order in db.</param>
         public void CreateOrder([FromBody] OrderDetail orderDetail)
         {
             using (var dbContext = new BakingbunnyContext())
@@ -98,6 +104,10 @@ namespace WebApi.Repository
             }
         }
 
+        /// <summary>
+        /// To faciliate POST method CreateCustomOrder.
+        /// </summary>
+        /// <param name="customOrder">CustomOrder class contains all necessary objects to accommodate custom cake order in db.</param>
         public void CreateCustomOrder([FromBody] CustomOrder customOrder)
         {
             using (var dbContext = new BakingbunnyContext())
