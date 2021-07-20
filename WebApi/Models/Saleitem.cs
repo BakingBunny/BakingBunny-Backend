@@ -5,11 +5,10 @@ using System.Collections.Generic;
 
 namespace WebApi.Models
 {
-    public partial class Saleitem
+    public partial class SaleItem
     {
-        public Saleitem()
+        public SaleItem()
         {
-            //Orderlists = new HashSet<Orderlist>();
         }
 
         public int Id { get; set; }
@@ -19,11 +18,5 @@ namespace WebApi.Models
         public int SizeId { get; set; }
         public int FruitId { get; set; }
         public int OrderListId { get; set; }
-
-        public virtual Fruit Fruit { get; set; }
-        public virtual Product Product { get; set; }
-        public virtual Size Size { get; set; }
-        //public virtual ICollection<Orderlist> Orderlists { get; set; }
-        public virtual Orderlist Orderlist { get; set; }
     }
 }

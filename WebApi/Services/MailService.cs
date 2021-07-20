@@ -24,7 +24,7 @@ namespace WebApi.Services
         /// </summary>
         /// <param name="customOrder"></param>
         /// <returns></returns>
-        public async Task SendInternalEmailAsync(CustomOrder customOrder)
+        public async Task SendInternalEmailCustomAsync(CustomOrder customOrder)
         {
             var email = new MimeMessage();
             email.Sender = MailboxAddress.Parse(_mailSettings.Mail);
@@ -55,7 +55,7 @@ namespace WebApi.Services
         /// </summary>
         /// <param name="customOrder"></param>
         /// <returns></returns>
-        public async Task SendEmailToClientAsync(CustomOrder customOrder)
+        public async Task SendEmailToClientCustomAsync(CustomOrder customOrder)
         {
             var email = new MimeMessage();
             email.Sender = MailboxAddress.Parse(_mailSettings.Mail);
@@ -82,6 +82,53 @@ namespace WebApi.Services
             smtp.Authenticate(_mailSettings.Mail, _mailSettings.Password);
             await smtp.SendAsync(email);            
             smtp.Disconnect(true);
+        }
+
+        public async Task SendInternalEmailRegularAsync(OrderDetail orderDetail)
+        {
+            var email = new MimeMessage();
+            email.Sender = MailboxAddress.Parse(_mailSettings.Mail);
+            email.To.Add(MailboxAddress.Parse("bakingbunny.yyc@gmail.com")); // Change the email address for test if needed.
+            email.Subject = "A regular order from " + orderDetail.user.Firstname + " " + orderDetail.user.Lastname;
+            var builder = new BodyBuilder();
+            string htmlBodyString = "<b>Name</b>: " + orderDetail.user.Firstname + " " + orderDetail.user.Lastname + "<br>" +
+                "<b>Email</b>: " + orderDetail.user.Email + "<br>" +
+                "<b>Phone</b>: " + orderDetail.user.Phone + "<br>" +
+                "<b>Delivery</b>: " + (orderDetail.orderList.Delivery ? "Yes<br>" : "No<br>") +
+                "<b>Address</b>: " + orderDetail.user.Address + "<br>" +
+                "<b>PostalCode</b>: " + orderDetail.user.PostalCode + "<br>" +
+                "<b>City</b>: " + orderDetail.user.City + "<br><br>" +
+                "The following products have been ordered:<br>" +
+                "<table>" +
+                "<tr><th>Product Name</th><th>Quantity</th><th>Price</th></tr>";
+            //foreach (Product p in orderDetail.productList)
+            //{
+            //    if (p.Category.Id == 1)
+            //    {
+            //        //htmlBodyString += "<tr>" +
+            //        //    "<td>" + p.Name + "</td>" +
+            //        //    "<td>" + orderDetail. + "</td>" +
+            //        //    "<td>" + p.Price * orderDetail.saleItem.Quantity + "</td>" +
+            //        //    "</tr>";
+            //    }
+            //    else
+            //    {
+
+            //    }
+            //}
+                htmlBodyString += "</table>";
+            builder.HtmlBody = htmlBodyString;
+
+            email.Body = builder.ToMessageBody();
+            using var smtp = new SmtpClient();
+            smtp.Connect(_mailSettings.Host, _mailSettings.Port, SecureSocketOptions.StartTls);
+            smtp.Authenticate(_mailSettings.Mail, _mailSettings.Password);
+            await smtp.SendAsync(email);
+            smtp.Disconnect(true);
+        }
+
+        public async Task SendEmailToClientRegularAsync(OrderDetail orderDetail)
+        {
         }
     }
 }

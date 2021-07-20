@@ -47,6 +47,33 @@ namespace WebApi.Repository
         }
 
         /// <summary>
+        /// Retrieve all sizes
+        /// </summary>
+        /// <returns>List<Size></returns>
+        List<Size> IProductRepository.GetSizes()
+        {
+            return _bakingbunnyContext.Size.ToList();
+        }
+
+        /// <summary>
+        /// Retrieve all fruits
+        /// </summary>
+        /// <returns>List<Fruit></returns>
+        List<Fruit> IProductRepository.GetFruits()
+        {
+            return _bakingbunnyContext.Fruit.ToList();
+        }
+
+        /// <summary>
+        /// Retrieve all cake types
+        /// </summary>
+        /// <returns>List<Caketypes></returns>
+        List<Caketype> IProductRepository.GetCaketypes()
+        {
+            return _bakingbunnyContext.Caketype.ToList();
+        }
+
+        /// <summary>
         /// To faciliate POST method CreateOrder.
         /// </summary>
         /// <param name="orderDetail">OrderDetail class contains all necessary objects to accommodate regular cake order in db.</param>
@@ -68,39 +95,38 @@ namespace WebApi.Repository
                 dbContext.SaveChanges();
 
                 double subTotal = 0;
-                foreach (Product p in orderDetail.productList)
-                    subTotal += p.Price;
-
-                Orderlist orderList = new Orderlist()
+                foreach (SaleItem saleItem in orderDetail.saleItems)
                 {
-                    Delivery = orderDetail.orderlist.Delivery,
-                    DeliveryFee = orderDetail.orderlist.DeliveryFee,
+                    Product p = dbContext.Product.Where(s => s.Id == saleItem.ProductId).FirstOrDefault();
+                    subTotal += p.Price * saleItem.Quantity;
+                }
+
+                OrderList orderList = new OrderList()
+                {
+                    Delivery = orderDetail.orderList.Delivery,
+                    DeliveryFee = orderDetail.orderList.DeliveryFee,
                     OrderDate = DateTime.Now,
                     Subtotal = (float)subTotal,
-                    Total = (float)subTotal + orderDetail.orderlist.DeliveryFee,
+                    Total = (float)subTotal + orderDetail.orderList.DeliveryFee,
                     UserId = user.Id,
                 };
                 dbContext.Add(orderList);
                 dbContext.SaveChanges();
-
-                Fruit chosenFruit = _bakingbunnyContext.Fruit.Where(s => s.FruitName.Equals(orderDetail.fruit.FruitName)).FirstOrDefault();
-                Size chosenSize = _bakingbunnyContext.Size.Where(s => s.SizeName.Equals(orderDetail.size.SizeName)).FirstOrDefault();
-
-                foreach (Product product in orderDetail.productList)
+                
+                foreach (SaleItem saleItem in orderDetail.saleItems)
                 {
-                    dbContext.Add(new Saleitem()
+                    dbContext.Add(new SaleItem()
                     {
-                        Quantity = orderDetail.quantity,
-                        Discount = 0, // Maybe remove this?
-                        FruitId = chosenFruit.Id,
-                        SizeId = chosenSize.Id,
+                        Quantity = saleItem.Quantity,
+                        Discount = 0,
+                        FruitId = saleItem.FruitId,
+                        SizeId = saleItem.SizeId,
                         OrderListId = orderList.Id,
-                        ProductId = product.Id,
+                        ProductId = saleItem.ProductId,
                     });
+
+                    dbContext.SaveChanges();
                 }
-
-                dbContext.SaveChanges();
-
             }
         }
 
@@ -125,10 +151,6 @@ namespace WebApi.Repository
                 dbContext.Add(user);
                 dbContext.SaveChanges();
 
-                Fruit chosenFruit = _bakingbunnyContext.Fruit.Where(s => s.FruitName.Equals(customOrder.Fruit.FruitName)).FirstOrDefault();
-                Size chosenSize = _bakingbunnyContext.Size.Where(s => s.SizeName.Equals(customOrder.Size.SizeName)).FirstOrDefault();
-                Caketype chosenCakeType = _bakingbunnyContext.Caketype.Where(s => s.Type.Equals(customOrder.CakeType.Type)).FirstOrDefault();
-
                 dbContext.Add(new CustomOrder()
                 {
                     Name = customOrder.Name,
@@ -136,9 +158,9 @@ namespace WebApi.Repository
                     Message = customOrder.Message,
                     Comment = customOrder.Comment,
                     UserId = user.Id,
-                    SizeId = chosenSize.Id,
-                    FruitId = chosenFruit.Id,
-                    CakeTypeId = chosenCakeType.Id,
+                    SizeId = customOrder.SizeId,
+                    FruitId = customOrder.FruitId,
+                    CakeTypeId = customOrder.CakeTypeId,
                 });
 
                 dbContext.SaveChanges();

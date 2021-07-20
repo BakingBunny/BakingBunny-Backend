@@ -8,7 +8,9 @@ namespace WebApi.Services
 {
     public interface IMailService
     {
-        Task SendInternalEmailAsync(CustomOrder customOrder);
-        Task SendEmailToClientAsync(CustomOrder customOrder);
+        Task SendInternalEmailRegularAsync(OrderDetail orderDetail);
+        Task SendEmailToClientRegularAsync(OrderDetail orderDetail);
+        Task SendInternalEmailCustomAsync(CustomOrder customOrder);
+        Task SendEmailToClientCustomAsync(CustomOrder customOrder);
     }
 }

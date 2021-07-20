@@ -9,7 +9,6 @@ namespace WebApi.Models
     {
         public Product()
         {
-            //Saleitems = new HashSet<Saleitem>();
         }
 
         public int Id { get; set; }
@@ -21,8 +20,5 @@ namespace WebApi.Models
         public string Comment { get; set; }
         public ulong Active { get; set; }
         public int CategoryId { get; set; }
-
-        public virtual Category Category { get; set; }
-        //public virtual ICollection<Saleitem> Saleitems { get; set; }
     }
 }

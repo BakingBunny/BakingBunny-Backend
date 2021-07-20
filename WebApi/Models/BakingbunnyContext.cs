@@ -23,9 +23,9 @@ namespace WebApi.Models
         public virtual DbSet<Category> Category { get; set; }
         public virtual DbSet<CustomOrder> CustomOrder { get; set; }
         public virtual DbSet<Fruit> Fruit { get; set; }
-        public virtual DbSet<Orderlist> Orderlist { get; set; }
+        public virtual DbSet<OrderList> Orderlist { get; set; }
         public virtual DbSet<Product> Product { get; set; }
-        public virtual DbSet<Saleitem> Saleitem { get; set; }
+        public virtual DbSet<SaleItem> Saleitem { get; set; }
         public virtual DbSet<Size> Size { get; set; }
         public virtual DbSet<User> User { get; set; }
 

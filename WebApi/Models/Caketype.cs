@@ -9,12 +9,9 @@ namespace WebApi.Models
     {
         public Caketype()
         {
-            //Customorders = new HashSet<Customorder>();
         }
 
         public int Id { get; set; }
         public string Type { get; set; }
-
-        //public virtual ICollection<Customorder> Customorders { get; set; }
     }
 }

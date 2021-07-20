@@ -18,9 +18,6 @@ namespace WebApi.Models
         public int FruitId { get; set; }
         public int CakeTypeId { get; set; }
 
-        public virtual Caketype CakeType { get; set; }
-        public virtual Fruit Fruit { get; set; }
-        public virtual Size Size { get; set; }
         public virtual User User { get; set; }
     }
 }
