@@ -5,13 +5,13 @@ using System.Collections.Generic;
 
 namespace WebApi.Models
 {
-    public partial class Fruit
+    public partial class Taste
     {
-        public Fruit()
+        public Taste()
         {
         }
 
         public int Id { get; set; }
-        public string FruitName { get; set; }
+        public string TasteName { get; set; }
     }
 }

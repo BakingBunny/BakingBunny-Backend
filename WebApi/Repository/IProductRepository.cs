@@ -14,7 +14,7 @@ namespace WebApi.Repository
         List<Product> GetCakes();
         List<Product> GetDacquoises();
         List<Size> GetSizes();
-        List<Fruit> GetFruits();
+        List<Taste> GetTastes();
         List<Caketype> GetCaketypes();
         void CreateOrder([FromBody] OrderDetail orderDetail);
 

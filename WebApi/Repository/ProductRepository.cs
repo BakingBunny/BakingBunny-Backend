@@ -7,16 +7,19 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using WebApi.Models;
+using WebApi.Services;
 
 namespace WebApi.Repository
 {
     public class ProductRepository : IProductRepository
     {
         private readonly BakingbunnyContext _bakingbunnyContext;
+        private readonly IMailService _mailService;
 
-        public ProductRepository(BakingbunnyContext bakingbunnyContext)
+        public ProductRepository(BakingbunnyContext bakingbunnyContext, IMailService mailService)
         {
             _bakingbunnyContext = bakingbunnyContext;
+            _mailService = mailService;
         }
 
         /// <summary>
@@ -25,7 +28,14 @@ namespace WebApi.Repository
         /// <returns>List<Product></returns>
         public List<Product> GetAll()
         {
-            return _bakingbunnyContext.Product.Where(s => s.Active == 1).ToList();
+            
+            return _bakingbunnyContext.Product.Where(s => s.Active).ToList();
+
+            //foreach (var p in products)
+            //{
+            //    p.Taste = _bakingbunnyContext.Taste.ToList();
+            //    p.Size = _bakingbunnyContext.Size.ToList();
+            //}
         }
 
         /// <summary>
@@ -34,7 +44,7 @@ namespace WebApi.Repository
         /// <returns>List<Product></returns>
         public List<Product> GetCakes()
         {
-            return _bakingbunnyContext.Product.Where(s => s.CategoryId == 1).Where(s => s.Active == 1).ToList();
+            return _bakingbunnyContext.Product.Where(s => s.CategoryId == 1).Where(s => s.Active).ToList();
         }
 
         /// <summary>
@@ -43,7 +53,7 @@ namespace WebApi.Repository
         /// <returns>List<Product></returns>
         public List<Product> GetDacquoises()
         {
-            return _bakingbunnyContext.Product.Where(s => s.CategoryId == 2).Where(s => s.Active == 1).ToList();
+            return _bakingbunnyContext.Product.Where(s => s.CategoryId == 2).Where(s => s.Active).ToList();
         }
 
         /// <summary>
@@ -59,9 +69,9 @@ namespace WebApi.Repository
         /// Retrieve all fruits
         /// </summary>
         /// <returns>List<Fruit></returns>
-        List<Fruit> IProductRepository.GetFruits()
+        List<Taste> IProductRepository.GetTastes()
         {
-            return _bakingbunnyContext.Fruit.ToList();
+            return _bakingbunnyContext.Taste.ToList();
         }
 
         /// <summary>
@@ -112,14 +122,14 @@ namespace WebApi.Repository
                 };
                 dbContext.Add(orderList);
                 dbContext.SaveChanges();
-                
+
                 foreach (SaleItem saleItem in orderDetail.saleItems)
                 {
                     dbContext.Add(new SaleItem()
                     {
                         Quantity = saleItem.Quantity,
                         Discount = 0,
-                        FruitId = saleItem.FruitId,
+                        TasteId = saleItem.TasteId,
                         SizeId = saleItem.SizeId,
                         OrderListId = orderList.Id,
                         ProductId = saleItem.ProductId,
@@ -127,6 +137,9 @@ namespace WebApi.Repository
 
                     dbContext.SaveChanges();
                 }
+
+                _mailService.SendEmailToClientRegularAsync(orderDetail, orderList.Id, GetAll());
+                _mailService.SendInternalEmailRegularAsync(orderDetail, orderList.Id, GetAll());
             }
         }
 
@@ -153,18 +166,20 @@ namespace WebApi.Repository
 
                 dbContext.Add(new CustomOrder()
                 {
-                    Name = customOrder.Name,
                     ExampleImage = customOrder.ExampleImage,
                     Message = customOrder.Message,
                     Comment = customOrder.Comment,
                     UserId = user.Id,
                     SizeId = customOrder.SizeId,
-                    FruitId = customOrder.FruitId,
+                    TasteId = customOrder.TasteId,
                     CakeTypeId = customOrder.CakeTypeId,
                 });
 
                 dbContext.SaveChanges();
             }
+
+            _mailService.SendEmailToClientCustomAsync(customOrder);
+            _mailService.SendInternalEmailCustomAsync(customOrder);
         }
     }
 }

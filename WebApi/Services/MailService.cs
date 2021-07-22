@@ -31,16 +31,17 @@ namespace WebApi.Services
             email.To.Add(MailboxAddress.Parse("bakingbunny.yyc@gmail.com")); // Change the email address for test if needed.
             email.Subject = "A custom cake order from " + customOrder.User.Firstname + " " + customOrder.User.Lastname;
             var builder = new BodyBuilder();
-            builder.HtmlBody = "<b>Name</b>: " + customOrder.User.Firstname + " " + customOrder.User.Lastname + "<br>" +
-                "<b>Email</b>: " + customOrder.User.Email + "<br>" +
-                "<b>Phone</b>: " + customOrder.User.Phone + "<br>" +
-                "<b>Delivery</b>: " + (customOrder.Delivery ? "Yes<br>" : "No<br>") +
-                "<b>Address</b>: " + customOrder.User.Address + "<br>" +
-                "<b>PostalCode</b>: " + customOrder.User.PostalCode + "<br>" +
-                "<b>City</b>: " + customOrder.User.City + "<br>" +
-                "<b>Example Image</b>: " + customOrder.ExampleImage + "<br>" + // Need to review this line.
-                "<b>Message on the cake</b>: " + customOrder.Message + "<br>" +
-                "<b>Comment</b>: " + customOrder.Comment + "<br>";
+            builder.HtmlBody = "<strong>Order#</b>: " + customOrder.Id + "<br>" +
+                "<strong>Name</strong>: " + customOrder.User.Firstname + " " + customOrder.User.Lastname + "<br>" +
+                "<strong>Email</strong>: " + customOrder.User.Email + "<br>" +
+                "<strong>Phone</strong>: " + customOrder.User.Phone + "<br>" +
+                "<strong>Delivery</strong>: " + (customOrder.Delivery ? "Yes<br>" : "No<br>") +
+                "<strong>Address</strong>: " + customOrder.User.Address + "<br>" +
+                "<strong>PostalCode</strong>: " + customOrder.User.PostalCode + "<br>" +
+                "<strong>City</strong>: " + customOrder.User.City + "<br>" +
+                "<strong>Example Image</strong>: " + customOrder.ExampleImage + "<br>" + // Need to review this line.
+                "<strong>Message on the cake</strong>: " + customOrder.Message + "<br>" +
+                "<strong>Comment</strong>: " + customOrder.Comment + "<br>";
             //builder.TextBody = "";
             email.Body = builder.ToMessageBody();
             using var smtp = new SmtpClient();
@@ -51,7 +52,7 @@ namespace WebApi.Services
         }
 
         /// <summary>
-        /// This method sends a confirmation email to the client.
+        /// This method sends the confirmation email of custom order to the client.
         /// </summary>
         /// <param name="customOrder"></param>
         /// <returns></returns>
@@ -64,14 +65,16 @@ namespace WebApi.Services
 #else
             email.To.Add(MailboxAddress.Parse(customOrder.User.Email));
 #endif
-            email.Subject = "Thank you for your custom cake order";
+            email.Subject = "Thank you for your custom cake order from Baking Bunny";
             var builder = new BodyBuilder();
             builder.HtmlBody = "Hi " + customOrder.User.Firstname + " " + customOrder.User.Lastname + ",<br><br>" +
+                "Your order # is: <strong>" + customOrder.Id + "</strong><br><br>" +
                 "We've received your custom cake order and will contact you as soon as your cake is ready.<br><br>" +
                 "Please feel free to reach us at <a href='mailto:bakingbunny.yyc@gmail.com'>bakingbunny.yyc@gmail.com</a>.<br><br>" +
                 "Best regards,<br>" +
                 "Baking Bunny";
             builder.TextBody = "Hi " + customOrder.User.Firstname + " " + customOrder.User.Lastname + "," +
+                "Your order # is: " + customOrder.Id +
                 "We've received your custom cake order and will contact you as soon as your cake is ready." +
                 "Please feel free to reach us at bakingbunny.yyc@gmail.com." +
                 "Best regards," +
@@ -80,43 +83,49 @@ namespace WebApi.Services
             using var smtp = new SmtpClient();
             smtp.Connect(_mailSettings.Host, _mailSettings.Port, SecureSocketOptions.StartTls);
             smtp.Authenticate(_mailSettings.Mail, _mailSettings.Password);
-            await smtp.SendAsync(email);            
+            await smtp.SendAsync(email);
             smtp.Disconnect(true);
         }
 
-        public async Task SendInternalEmailRegularAsync(OrderDetail orderDetail)
+        /// <summary>
+        /// This method sends a regular order details to bakingbunny.yyc@gmail.com
+        /// </summary>
+        /// <param name="orderDetail"></param>
+        /// <returns></returns>
+        public async Task SendInternalEmailRegularAsync(OrderDetail orderDetail, int orderId, List<Product> products)
         {
+            double subtotal = 0;
             var email = new MimeMessage();
             email.Sender = MailboxAddress.Parse(_mailSettings.Mail);
-            email.To.Add(MailboxAddress.Parse("bakingbunny.yyc@gmail.com")); // Change the email address for test if needed.
+            email.To.Add(MailboxAddress.Parse("ahnjaehwan@hotmail.com")); // Change the email address for test if needed.
             email.Subject = "A regular order from " + orderDetail.user.Firstname + " " + orderDetail.user.Lastname;
             var builder = new BodyBuilder();
-            string htmlBodyString = "<b>Name</b>: " + orderDetail.user.Firstname + " " + orderDetail.user.Lastname + "<br>" +
-                "<b>Email</b>: " + orderDetail.user.Email + "<br>" +
-                "<b>Phone</b>: " + orderDetail.user.Phone + "<br>" +
-                "<b>Delivery</b>: " + (orderDetail.orderList.Delivery ? "Yes<br>" : "No<br>") +
-                "<b>Address</b>: " + orderDetail.user.Address + "<br>" +
-                "<b>PostalCode</b>: " + orderDetail.user.PostalCode + "<br>" +
-                "<b>City</b>: " + orderDetail.user.City + "<br><br>" +
-                "The following products have been ordered:<br>" +
+            string htmlBodyString = "<strong>Order#</strong>: " + orderId + "<br>" +
+                "<strong>Name</strong>: " + orderDetail.user.Firstname + " " + orderDetail.user.Lastname + "<br>" +
+                "<strong>Email</strong>: " + orderDetail.user.Email + "<br>" +
+                "<strong>Phone</strong>: " + orderDetail.user.Phone + "<br>" +
+                "<strong>Delivery</strong>: " + (orderDetail.orderList.Delivery ? "Yes<br>" : "No<br>") +
+                "<strong>Address</strong>: " + orderDetail.user.Address + "<br>" +
+                "<strong>PostalCode</strong>: " + orderDetail.user.PostalCode + "<br>" +
+                "<strong>City</strong>: " + orderDetail.user.City + "<br><br>" +
+                "The order details are as follows:<br><br>" +
                 "<table>" +
-                "<tr><th>Product Name</th><th>Quantity</th><th>Price</th></tr>";
-            //foreach (Product p in orderDetail.productList)
-            //{
-            //    if (p.Category.Id == 1)
-            //    {
-            //        //htmlBodyString += "<tr>" +
-            //        //    "<td>" + p.Name + "</td>" +
-            //        //    "<td>" + orderDetail. + "</td>" +
-            //        //    "<td>" + p.Price * orderDetail.saleItem.Quantity + "</td>" +
-            //        //    "</tr>";
-            //    }
-            //    else
-            //    {
+                "<tr><th style='text-align: left;'>Product Name</th><th style='text-align: left;'>Quantity</th><th style='text-align: left;'>Price</th></tr>";
 
-            //    }
-            //}
-                htmlBodyString += "</table>";
+            foreach (SaleItem s in orderDetail.saleItems)
+            {
+                var p = products.Find(x => x.Id == s.ProductId);
+                subtotal += p.Price * s.Quantity;
+                htmlBodyString += "<tr>" +
+                        "<td>" + p.Name + "</td>" +
+                        "<td>" + s.Quantity + "</td>" +
+                        "<td>" + p.Price * s.Quantity + "</td>" +
+                        "</tr>";
+            }
+            htmlBodyString += "<tr><td>Subtotal</td><td></td><td>" + subtotal + "</td></tr>";
+            htmlBodyString += "<tr><td>Delivery Fee</td><td></td><td>" + orderDetail.orderList.DeliveryFee + "</td></tr>";
+            htmlBodyString += "<tr><td>Total</td><td></td><td>" + (subtotal + Convert.ToDouble(orderDetail.orderList.DeliveryFee)) + "</td></tr>";
+            htmlBodyString += "</table>";
             builder.HtmlBody = htmlBodyString;
 
             email.Body = builder.ToMessageBody();
@@ -127,8 +136,60 @@ namespace WebApi.Services
             smtp.Disconnect(true);
         }
 
-        public async Task SendEmailToClientRegularAsync(OrderDetail orderDetail)
+        /// <summary>
+        /// This method sends the confirmation order of regular order to the client
+        /// </summary>
+        /// <param name="orderDetail"></param>
+        /// <returns></returns>
+        public async Task SendEmailToClientRegularAsync(OrderDetail orderDetail, int orderId, List<Product> products)
         {
+            double subtotal = 0;
+            var email = new MimeMessage();
+            email.Sender = MailboxAddress.Parse(_mailSettings.Mail);
+            email.To.Add(MailboxAddress.Parse("ahnjaehwan@hotmail.com")); // Change the email address for test if needed.
+            email.Subject = "Thank you for ordering from Baking Bunny";
+            var builder = new BodyBuilder();
+            string htmlBodyString = "Hi " + orderDetail.user.Firstname + " " + orderDetail.user.Lastname + ",<br><br>" +
+                "Your order # is: <strong>" + orderId + "</strong><br><br>" +
+                "We've received your order and will try our best to have your order ready on time.<br><br>" +
+                //"<strong>Name</strong>: " + orderDetail.user.Firstname + " " + orderDetail.user.Lastname + "<br>" +
+                //"<strong>Email</strong>: " + orderDetail.user.Email + "<br>" +
+                //"<strong>Phone</strong>: " + orderDetail.user.Phone + "<br>" +
+                //"<strong>Delivery</strong>: " + (orderDetail.orderList.Delivery ? "Yes<br>" : "No<br>") +
+                //"<strong>Address</strong>: " + orderDetail.user.Address + "<br>" +
+                //"<strong>PostalCode</strong>: " + orderDetail.user.PostalCode + "<br>" +
+                //"<strong>City</strong>: " + orderDetail.user.City + "<br><br>" +
+                "Your order details are as follow:<br><br>" +
+                "<table>" +
+                "<tr><th style='text-align: left;'>Product Name</th><th style='text-align: left;'>Quantity</th><th style='text-align: left;'>Price</th></tr>";
+
+            foreach (SaleItem s in orderDetail.saleItems)
+            {
+                var p = products.Find(x => x.Id == s.ProductId);
+                subtotal += p.Price * s.Quantity;
+                htmlBodyString += "<tr>" +
+                        "<td>" + p.Name + "</td>" +
+                        "<td>" + s.Quantity + "</td>" +
+                        "<td>" + p.Price * s.Quantity + "</td>" +
+                        "</tr>";
+            }
+            htmlBodyString += "<tr><td>Subtotal</td><td></td><td>" + subtotal + "</td></tr>";
+            htmlBodyString += "<tr><td>Delivery Fee</td><td></td><td>" + orderDetail.orderList.DeliveryFee + "</td></tr>";
+            htmlBodyString += "<tr><td>Total</td><td></td><td>" + (subtotal + Convert.ToDouble(orderDetail.orderList.DeliveryFee)) + "</td></tr>";
+            htmlBodyString += "</table>";
+            htmlBodyString += "<br><br>";
+            htmlBodyString += "Please feel free to reach us at bakingbunny.yyc@gmail.com.<br><br>";
+            htmlBodyString += "Best regards,<br>";
+            htmlBodyString += "Baking Bunny";
+
+            builder.HtmlBody = htmlBodyString;
+
+            email.Body = builder.ToMessageBody();
+            using var smtp = new SmtpClient();
+            smtp.Connect(_mailSettings.Host, _mailSettings.Port, SecureSocketOptions.StartTls);
+            smtp.Authenticate(_mailSettings.Mail, _mailSettings.Password);
+            await smtp.SendAsync(email);
+            smtp.Disconnect(true);
         }
     }
 }

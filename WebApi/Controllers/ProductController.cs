@@ -23,6 +23,12 @@ namespace WebApiCrud.Controllers
             _mailService = mailService;
         }
 
+        [HttpGet]
+        public List<Product> GetAll()
+        {
+            return _productRepository.GetAll();
+        }
+
         [HttpGet("cake")]
         public List<Product> GetCakes()
         {
@@ -41,10 +47,10 @@ namespace WebApiCrud.Controllers
             return _productRepository.GetSizes();
         }
 
-        [HttpGet("fruit")]
-        public List<Fruit> GetFruits()
+        [HttpGet("taste")]
+        public List<Taste> GetTastes()
         {
-            return _productRepository.GetFruits();
+            return _productRepository.GetTastes();
         }
 
         [HttpGet("caketype")]
@@ -56,23 +62,13 @@ namespace WebApiCrud.Controllers
         [HttpPost("Order")]
         public void CreateOrder([FromBody] OrderDetail orderDetail)
         {
-#if (DEBUG)
             _productRepository.CreateOrder(orderDetail);
-#else
-            _mailService.SendInternalEmailRegularAsync(orderDetail);
-            _mailService.SendEmailToClientRegularAsync(orderDetail);
-#endif
         }
 
         [HttpPost("CustomOrder")]
         public void CreateCustomOrder([FromBody] CustomOrder customOrder)
         {
-#if (DEBUG)
             _productRepository.CreateCustomOrder(customOrder);
-#else
-            _mailService.SendInternalEmailCustomAsync(customOrder);
-            _mailService.SendEmailToClientCustomAsync(customOrder);
-#endif
         }
     }
 }
