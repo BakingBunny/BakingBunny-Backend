@@ -23,44 +23,54 @@ namespace WebApi.Repository
         }
 
         /// <summary>
-        /// Get all products
+        /// Get all product details for frontend
         /// </summary>
-        /// <returns>List<Product></returns>
-        public List<Product> GetAll()
+        /// <returns></returns>
+        public List<ProductDetail> GetAll()
         {
-            
-            return _bakingbunnyContext.Product.Where(s => s.Active).ToList();
+            List<ProductDetail> productDetailList = new List <ProductDetail>();
+            List<Product> productList = GetProducts();
+            List<Taste> tasteList = GetTastes();
+            List<Size> sizeList = GetSizes();
 
-            //foreach (var p in products)
-            //{
-            //    p.Taste = _bakingbunnyContext.Taste.ToList();
-            //    p.Size = _bakingbunnyContext.Size.ToList();
-            //}
-        }
+            ProductDetail productDetail;
+            foreach (Product p in productList)
+            {
+                productDetail = new ProductDetail();
+                productDetail.ProductId = p.Id;
+                productDetail.ProductName = p.Name;
+                productDetail.Price = p.Price;
+                productDetail.Description = p.Description;
+                productDetail.ProductImage = p.ProductImage;
+                productDetail.Comment = p.Comment;
+                productDetail.CategoryId = p.CategoryId;
 
-        /// <summary>
-        /// Retrieve all active cake products
-        /// </summary>
-        /// <returns>List<Product></returns>
-        public List<Product> GetCakes()
-        {
-            return _bakingbunnyContext.Product.Where(s => s.CategoryId == 1).Where(s => s.Active).ToList();
-        }
+                // Taste
+                if (p.Id == 29)
+                    productDetail.TasteList = tasteList.Where(t => t.Id >= 4 && t.Id <= 9).ToList();
+                else if (p.Id == 2)
+                    productDetail.TasteList = tasteList.Where(t => t.Id <= 3).ToList();
+                else
+                    productDetail.TasteList = new List<Taste>();
 
-        /// <summary>
-        /// Retrieve all active dacquoise products
-        /// </summary>
-        /// <returns>List<Product></returns>
-        public List<Product> GetDacquoises()
-        {
-            return _bakingbunnyContext.Product.Where(s => s.CategoryId == 2).Where(s => s.Active).ToList();
+                // Size
+                if (p.CategoryId == 1)
+                    productDetail.SizeList = sizeList;
+                else
+                    productDetail.SizeList = new List<Size>();
+
+                productDetailList.Add(productDetail);
+            }
+
+
+            return productDetailList;
         }
 
         /// <summary>
         /// Retrieve all sizes
         /// </summary>
         /// <returns>List<Size></returns>
-        List<Size> IProductRepository.GetSizes()
+        public List<Size> GetSizes()
         {
             return _bakingbunnyContext.Size.ToList();
         }
@@ -69,18 +79,18 @@ namespace WebApi.Repository
         /// Retrieve all fruits
         /// </summary>
         /// <returns>List<Fruit></returns>
-        List<Taste> IProductRepository.GetTastes()
+        public List<Taste> GetTastes()
         {
             return _bakingbunnyContext.Taste.ToList();
         }
 
         /// <summary>
-        /// Retrieve all cake types
+        /// Just for email method to provide product data.
         /// </summary>
-        /// <returns>List<Caketypes></returns>
-        List<Caketype> IProductRepository.GetCaketypes()
+        /// <returns>List<Product></returns>
+        private List<Product> GetProducts()
         {
-            return _bakingbunnyContext.Caketype.ToList();
+            return _bakingbunnyContext.Product.Where(s => s.Active).ToList();
         }
 
         /// <summary>
@@ -113,6 +123,7 @@ namespace WebApi.Repository
 
                 OrderList orderList = new OrderList()
                 {
+                    PickupDeliveryDate = orderDetail.orderList.PickupDeliveryDate,
                     Delivery = orderDetail.orderList.Delivery,
                     DeliveryFee = orderDetail.orderList.DeliveryFee,
                     OrderDate = DateTime.Now,
@@ -138,8 +149,8 @@ namespace WebApi.Repository
                     dbContext.SaveChanges();
                 }
 
-                _mailService.SendEmailToClientRegularAsync(orderDetail, orderList.Id, GetAll());
-                _mailService.SendInternalEmailRegularAsync(orderDetail, orderList.Id, GetAll());
+                _mailService.SendEmailToClientRegularAsync(orderDetail, orderList.Id, GetProducts());
+                _mailService.SendInternalEmailRegularAsync(orderDetail, orderList.Id, GetProducts());
             }
         }
 

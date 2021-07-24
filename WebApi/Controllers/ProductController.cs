@@ -24,39 +24,9 @@ namespace WebApiCrud.Controllers
         }
 
         [HttpGet]
-        public List<Product> GetAll()
+        public List<ProductDetail> GetAll()
         {
             return _productRepository.GetAll();
-        }
-
-        [HttpGet("cake")]
-        public List<Product> GetCakes()
-        {
-            return _productRepository.GetCakes();
-        }
-
-        [HttpGet("dacq")]
-        public List<Product> GetDacquoises()
-        {
-            return _productRepository.GetDacquoises();
-        }
-
-        [HttpGet("size")]
-        public List<Size> GetSizes()
-        {
-            return _productRepository.GetSizes();
-        }
-
-        [HttpGet("taste")]
-        public List<Taste> GetTastes()
-        {
-            return _productRepository.GetTastes();
-        }
-
-        [HttpGet("caketype")]
-        public List<Caketype> GetCaketypes()
-        {
-            return _productRepository.GetCaketypes();
         }
 
         [HttpPost("Order")]

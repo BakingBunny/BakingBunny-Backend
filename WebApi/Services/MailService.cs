@@ -104,8 +104,14 @@ namespace WebApi.Services
                 "<strong>Name</strong>: " + orderDetail.user.Firstname + " " + orderDetail.user.Lastname + "<br>" +
                 "<strong>Email</strong>: " + orderDetail.user.Email + "<br>" +
                 "<strong>Phone</strong>: " + orderDetail.user.Phone + "<br>" +
-                "<strong>Delivery</strong>: " + (orderDetail.orderList.Delivery ? "Yes<br>" : "No<br>") +
-                "<strong>Address</strong>: " + orderDetail.user.Address + "<br>" +
+                "<strong>Delivery</strong>: " + (orderDetail.orderList.Delivery ? "Yes<br>" : "No<br>");
+
+                if (orderDetail.orderList.Delivery)
+                    htmlBodyString += "<strong>Delivery Date</strong>: " + orderDetail.orderList.PickupDeliveryDate + "<br>";
+                else
+                    htmlBodyString += "<strong>Pickup Date</strong>: " + orderDetail.orderList.PickupDeliveryDate + "<br>";
+
+                htmlBodyString += "<strong>Address</strong>: " + orderDetail.user.Address + "<br>" +
                 "<strong>PostalCode</strong>: " + orderDetail.user.PostalCode + "<br>" +
                 "<strong>City</strong>: " + orderDetail.user.City + "<br><br>" +
                 "The order details are as follows:<br><br>" +
@@ -178,6 +184,10 @@ namespace WebApi.Services
             htmlBodyString += "<tr><td>Total</td><td></td><td>" + (subtotal + Convert.ToDouble(orderDetail.orderList.DeliveryFee)) + "</td></tr>";
             htmlBodyString += "</table>";
             htmlBodyString += "<br><br>";
+            if (orderDetail.orderList.Delivery)
+                htmlBodyString += "Your order will be delivered on " + orderDetail.orderList.PickupDeliveryDate + "<br><br>";
+            else
+                htmlBodyString += "Your order will be ready to be picked up on " + orderDetail.orderList.PickupDeliveryDate + "<br><br>";
             htmlBodyString += "Please feel free to reach us at bakingbunny.yyc@gmail.com.<br><br>";
             htmlBodyString += "Best regards,<br>";
             htmlBodyString += "Baking Bunny";
