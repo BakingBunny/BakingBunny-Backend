@@ -23,6 +23,12 @@ namespace WebApiCrud.Controllers
             _mailService = mailService;
         }
 
+        //[HttpGet]
+        //public List<ProductDetail> GetAll()
+        //{
+        //    return _productRepository.GetAll();
+        //}
+
         [HttpGet]
         public List<ProductDetail> GetAll()
         {

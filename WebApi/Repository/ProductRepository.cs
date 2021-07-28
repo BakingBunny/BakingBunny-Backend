@@ -25,7 +25,7 @@ namespace WebApi.Repository
         /// <summary>
         /// Get all product details for frontend
         /// </summary>
-        /// <returns></returns>
+        /// <returns>List<ProductDetail></returns>
         public List<ProductDetail> GetAll()
         {
             List<ProductDetail> productDetailList = new List <ProductDetail>();
