@@ -29,13 +29,25 @@ namespace WebApiCrud.Controllers
             return _productRepository.GetAll();
         }
 
-        [HttpPost("Order")]
+        [HttpGet("cake")]
+        public List<Product> GetCakes()
+        {
+            return _productRepository.GetCakes();
+        }
+
+        [HttpGet("dacq")]
+        public List<Product> GetDacquoises()
+        {
+            return _productRepository.GetDacquoises();
+        }
+
+        [HttpPost("order")]
         public void CreateOrder([FromBody] OrderDetail orderDetail)
         {
             _productRepository.CreateOrder(orderDetail);
         }
 
-        [HttpPost("CustomOrder")]
+        [HttpPost("customorder")]
         public void CreateCustomOrder([FromBody] CustomOrder customOrder)
         {
             _productRepository.CreateCustomOrder(customOrder);

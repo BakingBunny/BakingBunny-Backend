@@ -67,6 +67,24 @@ namespace WebApi.Repository
         }
 
         /// <summary>
+        /// Retrieve only cake list
+        /// </summary>
+        /// <returns>List<Product></returns>
+        public List<Product> GetCakes()
+        {
+            return _bakingbunnyContext.Product.Where(c => c.CategoryId == 1).Where(c => c.Active).ToList();
+        }
+
+        /// <summary>
+        /// Retrieve only dacquoise list
+        /// </summary>
+        /// <returns></returns>
+        public List<Product> GetDacquoises()
+        {
+            return _bakingbunnyContext.Product.Where(c => c.CategoryId == 2).Where(c => c.Active).ToList();
+        }
+
+        /// <summary>
         /// Retrieve all sizes
         /// </summary>
         /// <returns>List<Size></returns>
