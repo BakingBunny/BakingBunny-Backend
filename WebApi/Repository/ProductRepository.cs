@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using NLog;
+using NLog.Web;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,7 +30,7 @@ namespace WebApi.Repository
         /// <returns>List<ProductDetail></returns>
         public List<ProductDetail> GetAll()
         {
-            List<ProductDetail> productDetailList = new List <ProductDetail>();
+            List<ProductDetail> productDetailList = new List<ProductDetail>();
             List<Product> productList = GetProducts();
             List<Taste> tasteList = GetTastes();
             List<Size> sizeList = GetSizes();
@@ -69,19 +71,83 @@ namespace WebApi.Repository
         /// <summary>
         /// Retrieve only cake list
         /// </summary>
-        /// <returns>List<Product></returns>
-        public List<Product> GetCakes()
+        /// <returns>List<ProductDetail></returns>
+        public List<ProductDetail> GetCakes()
         {
-            return _bakingbunnyContext.Product.Where(c => c.CategoryId == 1).Where(c => c.Active).ToList();
+            List<ProductDetail> productDetailList = new List<ProductDetail>();
+            List<Product> productList = GetProducts().Where(p => p.CategoryId == 1).ToList();
+            List<Taste> tasteList = GetTastes();
+            List<Size> sizeList = GetSizes();
+
+            ProductDetail productDetail;
+            foreach (Product p in productList)
+            {
+                productDetail = new ProductDetail();
+                productDetail.ProductId = p.Id;
+                productDetail.ProductName = p.Name;
+                productDetail.Price = p.Price;
+                productDetail.Description = p.Description;
+                productDetail.ProductImage = p.ProductImage;
+                productDetail.Comment = p.Comment;
+                productDetail.CategoryId = p.CategoryId;
+
+                // Taste
+                if (p.Id == 29)
+                    productDetail.TasteList = tasteList.Where(t => t.Id >= 4 && t.Id <= 9).ToList();
+                else if (p.Id == 2)
+                    productDetail.TasteList = tasteList.Where(t => t.Id <= 3).ToList();
+                else
+                    productDetail.TasteList = new List<Taste>();
+
+                // Size
+                productDetail.SizeList = sizeList;
+
+                productDetailList.Add(productDetail);
+            }
+
+
+            return productDetailList;
         }
 
         /// <summary>
         /// Retrieve only dacquoise list
         /// </summary>
-        /// <returns></returns>
-        public List<Product> GetDacquoises()
+        /// <returns>List<ProductDetail></returns>
+        public List<ProductDetail> GetDacquoises()
         {
-            return _bakingbunnyContext.Product.Where(c => c.CategoryId == 2).Where(c => c.Active).ToList();
+            List<ProductDetail> productDetailList = new List<ProductDetail>();
+            List<Product> productList = GetProducts().Where(p => p.CategoryId == 2).ToList(); ;
+            List<Taste> tasteList = GetTastes();
+            List<Size> sizeList = GetSizes();
+
+            ProductDetail productDetail;
+            foreach (Product p in productList)
+            {
+                productDetail = new ProductDetail();
+                productDetail.ProductId = p.Id;
+                productDetail.ProductName = p.Name;
+                productDetail.Price = p.Price;
+                productDetail.Description = p.Description;
+                productDetail.ProductImage = p.ProductImage;
+                productDetail.Comment = p.Comment;
+                productDetail.CategoryId = p.CategoryId;
+
+                // Taste
+                if (p.Id == 29)
+                    productDetail.TasteList = tasteList.Where(t => t.Id >= 4 && t.Id <= 9).ToList();
+                else if (p.Id == 2)
+                    productDetail.TasteList = tasteList.Where(t => t.Id <= 3).ToList();
+                else
+                    productDetail.TasteList = new List<Taste>();
+
+                // Size
+                productDetail.SizeList = new List<Size>();
+
+                productDetailList.Add(productDetail);
+            }
+
+
+            return productDetailList;
         }
 
         /// <summary>
