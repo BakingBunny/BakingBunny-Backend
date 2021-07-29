@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using NLog;
 using NLog.Web;
 using System;
 using System.Collections.Generic;
@@ -14,14 +15,16 @@ namespace WebApi
     {
         public static void Main(string [] args)
         {
-            var logger = NLog.Web.NLogBuilder.ConfigureNLog("nlog.config").GetCurrentClassLogger();
+            var logger = LogManager.Setup()
+                       .LoadConfigurationFromAppSettings()
+                       .GetCurrentClassLogger();
             try
             {
                 CreateHostBuilder(args).Build().Run();
             }
             catch (Exception ex)
             {
-                logger.Error(ex.ToString().Substring(0, 10), "Stopped due to exception");
+                logger.Error(ex, "The program could not launch due to exception.");
             }
             finally
             {

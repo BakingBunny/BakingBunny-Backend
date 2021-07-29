@@ -35,7 +35,6 @@ namespace WebApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddScoped<IProductRepository, ProductRepository>();
-            //services.AddScoped<IMailService, MailService>();
             services.AddTransient<IMailService, MailService>();
             services.AddDbContext<BakingbunnyContext>();
             string dfd = Configuration.GetConnectionString("localBakingBunnyDB");
