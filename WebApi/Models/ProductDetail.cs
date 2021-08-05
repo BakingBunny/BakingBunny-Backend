@@ -1,25 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
-using WebApi.Models;
-
-#nullable disable
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace WebApi.Models
 {
-    public partial class Product
+    public class ProductDetail
     {
-        public Product()
-        {
-        }
-
-        public int Id { get; set; }
-        public string Name { get; set; }
+        public int ProductId { get; set; }
+        public string ProductName { get; set; }
         public float Price { get; set; }
         public string Description { get; set; }
         public string ProductImage { get; set; }
         public string Comment { get; set; }
-        public bool Active { get; set; }
         public int CategoryId { get; set; }
-
+        public List<Taste> TasteList { get; set; }
+        public List<Size> SizeList { get; set; }
     }
 }

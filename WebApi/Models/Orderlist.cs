@@ -13,6 +13,7 @@ namespace WebApi.Models
         public float Total { get; set; }
         public bool Delivery { get; set; }
         public DateTime OrderDate { get; set; }
+        public DateTime PickupDeliveryDate { get; set; }
         public int UserId { get; set; }
     }
 }

@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using NLog;
+using NLog.Web;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,50 +9,152 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using WebApi.Models;
+using WebApi.Services;
 
 namespace WebApi.Repository
 {
     public class ProductRepository : IProductRepository
     {
         private readonly BakingbunnyContext _bakingbunnyContext;
+        private readonly IMailService _mailService;
 
-        public ProductRepository(BakingbunnyContext bakingbunnyContext)
+        public ProductRepository(BakingbunnyContext bakingbunnyContext, IMailService mailService)
         {
             _bakingbunnyContext = bakingbunnyContext;
+            _mailService = mailService;
         }
 
         /// <summary>
-        /// Get all products
+        /// Get all product details for frontend
         /// </summary>
-        /// <returns>List<Product></returns>
-        public List<Product> GetAll()
+        /// <returns>List<ProductDetail></returns>
+        public List<ProductDetail> GetAll()
         {
-            return _bakingbunnyContext.Product.Where(s => s.Active == 1).ToList();
+            List<ProductDetail> productDetailList = new List<ProductDetail>();
+            List<Product> productList = GetProducts();
+            List<Taste> tasteList = GetTastes();
+            List<Size> sizeList = GetSizes();
+
+            ProductDetail productDetail;
+            foreach (Product p in productList)
+            {
+                productDetail = new ProductDetail();
+                productDetail.ProductId = p.Id;
+                productDetail.ProductName = p.Name;
+                productDetail.Price = p.Price;
+                productDetail.Description = p.Description;
+                productDetail.ProductImage = p.ProductImage;
+                productDetail.Comment = p.Comment;
+                productDetail.CategoryId = p.CategoryId;
+
+                // Taste
+                if (p.Id == 29)
+                    productDetail.TasteList = tasteList.Where(t => t.Id >= 4 && t.Id <= 9).ToList();
+                else if (p.Id == 2)
+                    productDetail.TasteList = tasteList.Where(t => t.Id <= 3).ToList();
+                else
+                    productDetail.TasteList = new List<Taste>();
+
+                // Size
+                if (p.CategoryId == 1)
+                    productDetail.SizeList = sizeList;
+                else
+                    productDetail.SizeList = new List<Size>();
+
+                productDetailList.Add(productDetail);
+            }
+
+
+            return productDetailList;
         }
 
         /// <summary>
-        /// Retrieve all active cake products
+        /// Retrieve only cake list
         /// </summary>
-        /// <returns>List<Product></returns>
-        public List<Product> GetCakes()
+        /// <returns>List<ProductDetail></returns>
+        public List<ProductDetail> GetCakes()
         {
-            return _bakingbunnyContext.Product.Where(s => s.CategoryId == 1).Where(s => s.Active == 1).ToList();
+            List<ProductDetail> productDetailList = new List<ProductDetail>();
+            List<Product> productList = GetProducts().Where(p => p.CategoryId == 1).ToList();
+            List<Taste> tasteList = GetTastes();
+            List<Size> sizeList = GetSizes();
+
+            ProductDetail productDetail;
+            foreach (Product p in productList)
+            {
+                productDetail = new ProductDetail();
+                productDetail.ProductId = p.Id;
+                productDetail.ProductName = p.Name;
+                productDetail.Price = p.Price;
+                productDetail.Description = p.Description;
+                productDetail.ProductImage = p.ProductImage;
+                productDetail.Comment = p.Comment;
+                productDetail.CategoryId = p.CategoryId;
+
+                // Taste
+                if (p.Id == 29)
+                    productDetail.TasteList = tasteList.Where(t => t.Id >= 4 && t.Id <= 9).ToList();
+                else if (p.Id == 2)
+                    productDetail.TasteList = tasteList.Where(t => t.Id <= 3).ToList();
+                else
+                    productDetail.TasteList = new List<Taste>();
+
+                // Size
+                productDetail.SizeList = sizeList;
+
+                productDetailList.Add(productDetail);
+            }
+
+
+            return productDetailList;
         }
 
         /// <summary>
-        /// Retrieve all active dacquoise products
+        /// Retrieve only dacquoise list
         /// </summary>
-        /// <returns>List<Product></returns>
-        public List<Product> GetDacquoises()
+        /// <returns>List<ProductDetail></returns>
+        public List<ProductDetail> GetDacquoises()
         {
-            return _bakingbunnyContext.Product.Where(s => s.CategoryId == 2).Where(s => s.Active == 1).ToList();
+            List<ProductDetail> productDetailList = new List<ProductDetail>();
+            List<Product> productList = GetProducts().Where(p => p.CategoryId == 2).ToList(); ;
+            List<Taste> tasteList = GetTastes();
+            List<Size> sizeList = GetSizes();
+
+            ProductDetail productDetail;
+            foreach (Product p in productList)
+            {
+                productDetail = new ProductDetail();
+                productDetail.ProductId = p.Id;
+                productDetail.ProductName = p.Name;
+                productDetail.Price = p.Price;
+                productDetail.Description = p.Description;
+                productDetail.ProductImage = p.ProductImage;
+                productDetail.Comment = p.Comment;
+                productDetail.CategoryId = p.CategoryId;
+
+                // Taste
+                if (p.Id == 29)
+                    productDetail.TasteList = tasteList.Where(t => t.Id >= 4 && t.Id <= 9).ToList();
+                else if (p.Id == 2)
+                    productDetail.TasteList = tasteList.Where(t => t.Id <= 3).ToList();
+                else
+                    productDetail.TasteList = new List<Taste>();
+
+                // Size
+                productDetail.SizeList = new List<Size>();
+
+                productDetailList.Add(productDetail);
+            }
+
+
+            return productDetailList;
         }
 
         /// <summary>
         /// Retrieve all sizes
         /// </summary>
         /// <returns>List<Size></returns>
-        List<Size> IProductRepository.GetSizes()
+        public List<Size> GetSizes()
         {
             return _bakingbunnyContext.Size.ToList();
         }
@@ -59,18 +163,18 @@ namespace WebApi.Repository
         /// Retrieve all fruits
         /// </summary>
         /// <returns>List<Fruit></returns>
-        List<Fruit> IProductRepository.GetFruits()
+        public List<Taste> GetTastes()
         {
-            return _bakingbunnyContext.Fruit.ToList();
+            return _bakingbunnyContext.Taste.ToList();
         }
 
         /// <summary>
-        /// Retrieve all cake types
+        /// Just for email method to provide product data.
         /// </summary>
-        /// <returns>List<Caketypes></returns>
-        List<Caketype> IProductRepository.GetCaketypes()
+        /// <returns>List<Product></returns>
+        private List<Product> GetProducts()
         {
-            return _bakingbunnyContext.Caketype.ToList();
+            return _bakingbunnyContext.Product.Where(s => s.Active).ToList();
         }
 
         /// <summary>
@@ -103,6 +207,7 @@ namespace WebApi.Repository
 
                 OrderList orderList = new OrderList()
                 {
+                    PickupDeliveryDate = orderDetail.orderList.PickupDeliveryDate,
                     Delivery = orderDetail.orderList.Delivery,
                     DeliveryFee = orderDetail.orderList.DeliveryFee,
                     OrderDate = DateTime.Now,
@@ -112,14 +217,14 @@ namespace WebApi.Repository
                 };
                 dbContext.Add(orderList);
                 dbContext.SaveChanges();
-                
+
                 foreach (SaleItem saleItem in orderDetail.saleItems)
                 {
                     dbContext.Add(new SaleItem()
                     {
                         Quantity = saleItem.Quantity,
                         Discount = 0,
-                        FruitId = saleItem.FruitId,
+                        TasteId = saleItem.TasteId,
                         SizeId = saleItem.SizeId,
                         OrderListId = orderList.Id,
                         ProductId = saleItem.ProductId,
@@ -127,6 +232,9 @@ namespace WebApi.Repository
 
                     dbContext.SaveChanges();
                 }
+
+                _mailService.SendEmailToClientRegularAsync(orderDetail, orderList.Id, GetProducts());
+                _mailService.SendInternalEmailRegularAsync(orderDetail, orderList.Id, GetProducts());
             }
         }
 
@@ -153,18 +261,20 @@ namespace WebApi.Repository
 
                 dbContext.Add(new CustomOrder()
                 {
-                    Name = customOrder.Name,
                     ExampleImage = customOrder.ExampleImage,
                     Message = customOrder.Message,
                     Comment = customOrder.Comment,
                     UserId = user.Id,
                     SizeId = customOrder.SizeId,
-                    FruitId = customOrder.FruitId,
+                    TasteId = customOrder.TasteId,
                     CakeTypeId = customOrder.CakeTypeId,
                 });
 
                 dbContext.SaveChanges();
             }
+
+            _mailService.SendEmailToClientCustomAsync(customOrder);
+            _mailService.SendInternalEmailCustomAsync(customOrder);
         }
     }
 }

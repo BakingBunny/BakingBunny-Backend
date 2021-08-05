@@ -5,9 +5,9 @@ using System.Collections.Generic;
 
 namespace WebApi.Models
 {
-    public partial class Caketype
+    public partial class CakeType
     {
-        public Caketype()
+        public CakeType()
         {
         }
 

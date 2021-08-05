@@ -16,7 +16,7 @@ namespace WebApi.Models
         public float? Discount { get; set; }
         public int ProductId { get; set; }
         public int SizeId { get; set; }
-        public int FruitId { get; set; }
+        public int TasteId { get; set; }
         public int OrderListId { get; set; }
     }
 }

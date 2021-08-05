@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,65 +15,85 @@ namespace WebApiCrud.Controllers
     [ApiController]
     public class ProductController : ControllerBase
     {
+        private static ILogger<ProductController> _logger;
         private readonly IProductRepository _productRepository;
         private readonly IMailService _mailService;
 
-        public ProductController(IProductRepository productRepository, IMailService mailService)
+        public ProductController(IProductRepository productRepository, IMailService mailService, ILogger<ProductController> logger)
         {
             _productRepository = productRepository;
             _mailService = mailService;
+            _logger = logger;
+        }
+
+        [HttpGet]
+        public List<ProductDetail> GetAll()
+        {
+            try
+            {
+                return _productRepository.GetAll();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while executing GetAll method");
+                return null;
+            }
         }
 
         [HttpGet("cake")]
-        public List<Product> GetCakes()
+        public List<ProductDetail> GetCakes()
         {
-            return _productRepository.GetCakes();
+            try
+            {
+                return _productRepository.GetCakes();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while executing GetCakes method");
+                return null;
+            }
         }
 
         [HttpGet("dacq")]
-        public List<Product> GetDacquoises()
+        public List<ProductDetail> GetDacquoises()
         {
-            return _productRepository.GetDacquoises();
+            try
+            {
+                return _productRepository.GetDacquoises();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while executing GetDacquoises method");
+                return null;
+            }
+            
         }
 
-        [HttpGet("size")]
-        public List<Size> GetSizes()
-        {
-            return _productRepository.GetSizes();
-        }
-
-        [HttpGet("fruit")]
-        public List<Fruit> GetFruits()
-        {
-            return _productRepository.GetFruits();
-        }
-
-        [HttpGet("caketype")]
-        public List<Caketype> GetCaketypes()
-        {
-            return _productRepository.GetCaketypes();
-        }
-
-        [HttpPost("Order")]
+        [HttpPost("order")]
         public void CreateOrder([FromBody] OrderDetail orderDetail)
         {
-#if (DEBUG)
-            _productRepository.CreateOrder(orderDetail);
-#else
-            _mailService.SendInternalEmailRegularAsync(orderDetail);
-            _mailService.SendEmailToClientRegularAsync(orderDetail);
-#endif
+            try
+            {
+                _productRepository.CreateOrder(orderDetail);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while executing CreateOrder method");
+            } 
         }
 
-        [HttpPost("CustomOrder")]
+        [HttpPost("customorder")]
         public void CreateCustomOrder([FromBody] CustomOrder customOrder)
         {
-#if (DEBUG)
-            _productRepository.CreateCustomOrder(customOrder);
-#else
-            _mailService.SendInternalEmailCustomAsync(customOrder);
-            _mailService.SendEmailToClientCustomAsync(customOrder);
-#endif
+            try
+            {
+                _productRepository.CreateCustomOrder(customOrder);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while executing CustomOrder method");
+            }
+            
         }
     }
 }
