@@ -17,5 +17,6 @@ namespace WebApi.Repository
         void CreateOrder([FromBody] OrderDetail orderDetail);
 
         void CreateCustomOrder([FromBody] CustomOrder customOrder);
+        int CalculateDeliveryFee(string postalCode);
     }
 }

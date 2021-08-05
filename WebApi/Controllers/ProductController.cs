@@ -93,7 +93,20 @@ namespace WebApiCrud.Controllers
             {
                 _logger.LogError(ex, "Error while executing CustomOrder method");
             }
-            
+        }
+
+        [HttpPost("delivery")]
+        public double CalculateDeliveryFee([FromBody] string postalCode)
+        {
+            try
+            {
+                return _productRepository.CalculateDeliveryFee(postalCode);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while executing CalculateDeliveryFee method");
+                return -1;
+            }
         }
     }
 }
