@@ -34,6 +34,16 @@ namespace WebApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(
+                    builder =>
+                    {
+                        builder.WithOrigins("https://www.bakingbunny.shop/",
+                            "https://bakingbunny.netlify.app/",
+                            "https://7hq1iew2e2.execute-api.us-west-2.amazonaws.com/test-docker-dotnet-0715-api/");
+                    });
+            });
             services.AddHttpClient();
             services.AddScoped<IProductRepository, ProductRepository>();
             services.AddTransient<IMailService, MailService>();
@@ -88,6 +98,8 @@ namespace WebApi
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseCors();
 
             app.UseAuthorization();
 
