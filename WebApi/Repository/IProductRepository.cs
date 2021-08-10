@@ -1,14 +1,22 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using WebApiCrud.Models;
+using WebApi.Models;
 
-namespace WebApiCrud.Repository
+namespace WebApi.Repository
 {
     public interface IProductRepository
     {
-        Task<IEnumerable<Product>> GetAll();
-        Task<Product> Get(int id);
+        List<ProductDetail> GetAll();
+        List<ProductDetail> GetCakes();
+        List<ProductDetail> GetDacquoises();
+        List<Size> GetSizes();
+        List<Taste> GetTastes();
+        void CreateOrder([FromBody] OrderDetail orderDetail);
+
+        void CreateCustomOrder([FromBody] CustomOrder customOrder);
+        int CalculateDeliveryFee(string postalCode);
     }
 }
