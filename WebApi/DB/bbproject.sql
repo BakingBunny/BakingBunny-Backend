@@ -57,8 +57,8 @@ CREATE TABLE User
 CREATE TABLE CustomOrder
 (
     Id int NOT NULL AUTO_INCREMENT,
-    ExampleImage varchar(200) NULL,
-    Message varchar(200) NULL,
+    RequestDescription varchar(200) NULL,
+    RequestDate Date NOT NULL,
     UserId int NOT NULL,
     SizeId int NOT NULL,
     TasteId int NOT NULL,
