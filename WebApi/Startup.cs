@@ -39,19 +39,27 @@ namespace WebApi
                 options.AddDefaultPolicy(
                     builder =>
                     {
-                        builder.WithOrigins("https://www.bakingbunny.shop/",
-                            "https://bakingbunny.netlify.app/",
-                            "https://7hq1iew2e2.execute-api.us-west-2.amazonaws.com/test-docker-dotnet-0715-api/");
+                        builder.SetIsOriginAllowed(_ => true)
+                            .AllowAnyMethod()
+                            .AllowAnyHeader()
+                            .AllowCredentials();
                     });
             });
+            //services.AddCors(options =>
+            //{
+            //    options.AddDefaultPolicy(
+            //        builder =>
+            //        {
+            //            builder.WithOrigins("https://www.bakingbunny.shop/",
+            //                "https://bakingbunny.netlify.app/",
+            //                "https://7hq1iew2e2.execute-api.us-west-2.amazonaws.com/test-docker-dotnet-0715-api/");
+            //        });
+            //});
             services.AddHttpClient();
             services.AddScoped<IProductRepository, ProductRepository>();
             services.AddTransient<IMailService, MailService>();
-            services.AddDbContext<BakingbunnyContext>();
-            string dfd = Configuration.GetConnectionString("localBakingBunnyDB");
 #if (DEBUG)
             services.AddDbContext<BakingbunnyContext>(options =>
-                //options.UseMySql(Configuration.GetConnectionString("localBakingBunnyDB"), Microsoft.EntityFrameworkCore.ServerVersion.Parse("8.0.25-mysql")));
                 options.UseMySql(Configuration.GetConnectionString("localBakingBunnyDB"), Microsoft.EntityFrameworkCore.ServerVersion.Parse("8.0.25-mysql")));
 #else
             services.AddDbContext<BakingbunnyContext>(options =>

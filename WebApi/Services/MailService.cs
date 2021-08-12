@@ -39,9 +39,8 @@ namespace WebApi.Services
                 "<strong>Address</strong>: " + customOrder.User.Address + "<br>" +
                 "<strong>PostalCode</strong>: " + customOrder.User.PostalCode + "<br>" +
                 "<strong>City</strong>: " + customOrder.User.City + "<br>" +
-                "<strong>Example Image</strong>: " + customOrder.ExampleImage + "<br>" + // Need to review this line.
-                "<strong>Message on the cake</strong>: " + customOrder.Message + "<br>" +
-                "<strong>Comment</strong>: " + customOrder.Comment + "<br>";
+                "<strong>Description</strong>: " + customOrder.RequestDescription + "<br>" +
+                "<strong>Order Date</strong>: " + customOrder.RequestDate + "<br>";
             //builder.TextBody = "";
             email.Body = builder.ToMessageBody();
             using var smtp = new SmtpClient();

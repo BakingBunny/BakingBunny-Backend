@@ -12,6 +12,8 @@ namespace WebApi.Models
         public float DeliveryFee { get; set; }
         public float Total { get; set; }
         public bool Delivery { get; set; }
+        public string Allergy { get; set; }
+        public string Comment { get; set; }
         public DateTime OrderDate { get; set; }
         public DateTime PickupDeliveryDate { get; set; }
         public int UserId { get; set; }

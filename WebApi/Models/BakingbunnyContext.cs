@@ -28,6 +28,7 @@ namespace WebApi.Models
         public virtual DbSet<SaleItem> Saleitem { get; set; }
         public virtual DbSet<Size> Size { get; set; }
         public virtual DbSet<User> User { get; set; }
+        public virtual DbSet<Delivery> Delivery { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

@@ -28,6 +28,38 @@ namespace WebApi.Repository
             _clientFactory = clientFactory;
         }
 
+        public ProductDetail GetProductById(int Id)
+        {
+            ProductDetail productDetail = new ProductDetail();
+            Product product = GetById(Id);
+            List<Taste> tasteList = GetTastes();
+            List<Size> sizeList = GetSizes();
+
+            productDetail.ProductId = product.Id;
+            productDetail.ProductName = product.Name;
+            productDetail.Price = product.Price;
+            productDetail.Description = product.Description;
+            productDetail.ProductImage = product.ProductImage;
+            productDetail.Comment = product.Comment;
+            productDetail.CategoryId = product.CategoryId;
+
+            // Taste
+            if (product.Id == 29)
+                productDetail.TasteList = tasteList.Where(t => t.Id >= 4 && t.Id <= 9).ToList();
+            else if (product.Id == 2)
+                productDetail.TasteList = tasteList.Where(t => t.Id <= 3).ToList();
+            else
+                productDetail.TasteList = new List<Taste>();
+
+            // Size
+            if (product.CategoryId == 1)
+                productDetail.SizeList = sizeList;
+            else
+                productDetail.SizeList = new List<Size>();
+
+            return productDetail;
+        }
+
         /// <summary>
         /// Get all product details for frontend
         /// </summary>
@@ -173,6 +205,15 @@ namespace WebApi.Repository
         }
 
         /// <summary>
+        /// Retrieve a Product object by Id
+        /// </summary>
+        /// <returns>Product</returns>
+        private Product GetById(int Id)
+        {
+            return _bakingbunnyContext.Product.Where(s => s.Active).Where(p => p.Id == Id).FirstOrDefault();
+        }
+
+        /// <summary>
         /// Just for email method to provide product data.
         /// </summary>
         /// <returns>List<Product></returns>
@@ -209,14 +250,20 @@ namespace WebApi.Repository
                     subTotal += p.Price * saleItem.Quantity;
                 }
 
+                string postalCode = orderDetail.user.PostalCode.ToLower();
+                postalCode = postalCode.Replace(" ", "");
+                Delivery delivery = FindDeliveryFee(postalCode);
+                int deliveryFee = delivery == null ? 0 : delivery.DeliveryFee;
+                orderDetail.orderList.DeliveryFee = deliveryFee;
+
                 OrderList orderList = new OrderList()
                 {
                     PickupDeliveryDate = orderDetail.orderList.PickupDeliveryDate,
                     Delivery = orderDetail.orderList.Delivery,
-                    DeliveryFee = orderDetail.orderList.DeliveryFee,
+                    DeliveryFee = deliveryFee,
                     OrderDate = DateTime.Now,
                     Subtotal = (float)subTotal,
-                    Total = (float)subTotal + orderDetail.orderList.DeliveryFee,
+                    Total = (float)subTotal + deliveryFee,
                     UserId = user.Id,
                 };
                 dbContext.Add(orderList);
@@ -265,9 +312,9 @@ namespace WebApi.Repository
 
                 dbContext.Add(new CustomOrder()
                 {
-                    ExampleImage = customOrder.ExampleImage,
-                    Message = customOrder.Message,
-                    Comment = customOrder.Comment,
+                    RequestDescription = customOrder.RequestDescription,
+                    RequestDate = customOrder.RequestDate,
+                    Delivery = customOrder.Delivery,
                     UserId = user.Id,
                     SizeId = customOrder.SizeId,
                     TasteId = customOrder.TasteId,
@@ -283,31 +330,57 @@ namespace WebApi.Repository
 
         public int CalculateDeliveryFee(string postalCode)
         {
-            int distance = GetDistance(postalCode);
+            int distance = -1;
+            int deliveryFee = -1;
 
-            if (distance < 0)
-                return -1;
-            else if (distance < 5000)
-                return 0;
-            else if (distance < 10000)
-                return 3;
-            else if (distance < 15000)
-                return 5;
-            else if (distance < 20000)
-                return 7;
-            else if (distance < 25000)
-                return 10;
+            postalCode = postalCode.Replace(" ", "");
+            postalCode = postalCode.ToLower();
+
+            Delivery delivery = FindDeliveryFee(postalCode);
+
+            if (delivery != null)
+            {
+                return delivery.DeliveryFee;
+            }
             else
-                return -1;
+            {
+                distance = GetDistance(postalCode);
+
+                if (distance < 0)
+                    deliveryFee = -1;
+                else if (distance < 5000)
+                    deliveryFee = 0;
+                else if (distance < 10000)
+                    deliveryFee = 3;
+                else if (distance < 15000)
+                    deliveryFee = 5;
+                else if (distance < 20000)
+                    deliveryFee = 7;
+                else if (distance < 25000)
+                    deliveryFee = 10;
+                else
+                    deliveryFee = -1;
+
+                if (deliveryFee > -1)
+                {
+                    AddDeliveryInfo(new Delivery()
+                    {
+                        PostalCode = postalCode,
+                        DeliveryFee = deliveryFee,
+                        Distance = distance
+                    });
+                }
+            }
+
+            return deliveryFee;
         }
 
         private int GetDistance (string postalCode)
         {
 #if (DEBUG)
-            //postalCode = "T2Y 3E4";
-            postalCode = "T3M 3A7";
+            //postalCode = "T2Y3E4";
+            //postalCode = "T3M3A7";
 #endif
-            postalCode = postalCode.Replace(" ", "");
 
             string url = "https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&origins=T2P3P3&destinations=" + postalCode + "&departure_time=now&key=AIzaSyCq7_wnyksRIYf6kOhCQ555TDZT0TKoeQY";
             var request = new HttpRequestMessage(HttpMethod.Get, url);
@@ -326,7 +399,8 @@ namespace WebApi.Repository
                         string jsonResponse = reader.ReadToEnd();
                         JToken destination = JObject.Parse(jsonResponse) ["destination_addresses"] [0];
                         
-                        if (!destination.HasValues)
+                        //if (!destination.HasValues)
+                        if (destination == null)
                             return -1;
 
                         JToken jToken = JObject.Parse(jsonResponse) ["rows"] [0] ["elements"] [0] ["distance"];
@@ -335,6 +409,20 @@ namespace WebApi.Repository
                 }
             }
             return distance;
+        }
+
+        private Delivery FindDeliveryFee (string postalCode)
+        {
+            return _bakingbunnyContext.Delivery.Where(d => d.PostalCode.Equals(postalCode)).FirstOrDefault();
+        }
+
+        private void AddDeliveryInfo(Delivery delivery)
+        {
+            using (var dbContext = new BakingbunnyContext())
+            {
+                dbContext.Add(delivery);
+                dbContext.SaveChanges();
+            }
         }
     }
 }
