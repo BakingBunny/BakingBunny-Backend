@@ -44,18 +44,24 @@ namespace WebApi.Repository
             productDetail.CategoryId = product.CategoryId;
 
             // Taste
-            if (product.Id == 29)
+            if (product.Id == 30) // Dacquoises combo
                 productDetail.TasteList = tasteList.Where(t => t.Id >= 4 && t.Id <= 9).ToList();
-            else if (product.Id == 2)
+            else if (product.Id == 2) // Wheap cream cake
                 productDetail.TasteList = tasteList.Where(t => t.Id <= 3).ToList();
             else
                 productDetail.TasteList = new List<Taste>();
 
             // Size
-            if (product.CategoryId == 1)
+            if (product.CategoryId == 1) // Cake
                 productDetail.SizeList = sizeList;
             else
                 productDetail.SizeList = new List<Size>();
+
+            // CakeType
+            if (product.Id == 7) // Custom Cake
+                productDetail.CakeTypeList = GetCakeTypes();
+            else
+                productDetail.CakeTypeList = new List<CakeType>();
 
             return productDetail;
         }
@@ -84,18 +90,24 @@ namespace WebApi.Repository
                 productDetail.CategoryId = p.CategoryId;
 
                 // Taste
-                if (p.Id == 29)
+                if (p.Id == 30) // Dacquoises combo
                     productDetail.TasteList = tasteList.Where(t => t.Id >= 4 && t.Id <= 9).ToList();
-                else if (p.Id == 2)
+                else if (p.Id == 2) // Wheap cream cake
                     productDetail.TasteList = tasteList.Where(t => t.Id <= 3).ToList();
                 else
                     productDetail.TasteList = new List<Taste>();
 
                 // Size
-                if (p.CategoryId == 1)
+                if (p.CategoryId == 1) // Cake
                     productDetail.SizeList = sizeList;
                 else
                     productDetail.SizeList = new List<Size>();
+
+                // CakeType
+                if (p.Id == 7) // Custom Cake
+                    productDetail.CakeTypeList = GetCakeTypes();
+                else
+                    productDetail.CakeTypeList = new List<CakeType>();
 
                 productDetailList.Add(productDetail);
             }
@@ -128,15 +140,19 @@ namespace WebApi.Repository
                 productDetail.CategoryId = p.CategoryId;
 
                 // Taste
-                if (p.Id == 29)
-                    productDetail.TasteList = tasteList.Where(t => t.Id >= 4 && t.Id <= 9).ToList();
-                else if (p.Id == 2)
+                if (p.Id == 2) // Wheap cream cake
                     productDetail.TasteList = tasteList.Where(t => t.Id <= 3).ToList();
                 else
                     productDetail.TasteList = new List<Taste>();
 
                 // Size
                 productDetail.SizeList = sizeList;
+
+                // CakeType
+                if (p.Id == 7) // Custom Cake
+                    productDetail.CakeTypeList = GetCakeTypes();
+                else
+                    productDetail.CakeTypeList = new List<CakeType>();
 
                 productDetailList.Add(productDetail);
             }
@@ -169,10 +185,8 @@ namespace WebApi.Repository
                 productDetail.CategoryId = p.CategoryId;
 
                 // Taste
-                if (p.Id == 29)
+                if (p.Id == 30) // Dacquoises combo
                     productDetail.TasteList = tasteList.Where(t => t.Id >= 4 && t.Id <= 9).ToList();
-                else if (p.Id == 2)
-                    productDetail.TasteList = tasteList.Where(t => t.Id <= 3).ToList();
                 else
                     productDetail.TasteList = new List<Taste>();
 
@@ -190,7 +204,7 @@ namespace WebApi.Repository
         /// Retrieve all sizes
         /// </summary>
         /// <returns>List<Size></returns>
-        public List<Size> GetSizes()
+        private List<Size> GetSizes()
         {
             return _bakingbunnyContext.Size.ToList();
         }
@@ -199,9 +213,18 @@ namespace WebApi.Repository
         /// Retrieve all fruits
         /// </summary>
         /// <returns>List<Fruit></returns>
-        public List<Taste> GetTastes()
+        private List<Taste> GetTastes()
         {
             return _bakingbunnyContext.Taste.ToList();
+        }
+
+        /// <summary>
+        /// Retrieve all cake types
+        /// </summary>
+        /// <returns>List<CakeType></returns>
+        private List<CakeType> GetCakeTypes() 
+        {
+            return _bakingbunnyContext.CakeType.ToList();
         }
 
         /// <summary>
@@ -324,8 +347,12 @@ namespace WebApi.Repository
                 dbContext.SaveChanges();
             }
 
-            _mailService.SendEmailToClientCustomAsync(customOrder);
-            _mailService.SendInternalEmailCustomAsync(customOrder);
+            Size customOrderSize = _bakingbunnyContext.Size.Where(s => s.Id == customOrder.SizeId).FirstOrDefault();
+            Taste customOrderTaste = _bakingbunnyContext.Taste.Where(t => t.Id == customOrder.TasteId).FirstOrDefault();
+            CakeType customOrderCakeType = _bakingbunnyContext.CakeType.Where(c => c.Id == customOrder.CakeTypeId).FirstOrDefault();
+
+            _mailService.SendEmailToClientCustomAsync(customOrder, customOrderSize, customOrderTaste, customOrderCakeType);
+            _mailService.SendInternalEmailCustomAsync(customOrder, customOrderSize, customOrderTaste, customOrderCakeType);
         }
 
         public int CalculateDeliveryFee(string postalCode)

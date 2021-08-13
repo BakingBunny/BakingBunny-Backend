@@ -16,5 +16,6 @@ namespace WebApi.Models
         public int CategoryId { get; set; }
         public List<Taste> TasteList { get; set; }
         public List<Size> SizeList { get; set; }
+        public List<CakeType> CakeTypeList { get; set; }
     }
 }

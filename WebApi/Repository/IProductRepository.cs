@@ -13,8 +13,6 @@ namespace WebApi.Repository
         List<ProductDetail> GetCakes();
         List<ProductDetail> GetDacquoises();
         ProductDetail GetProductById(int Id);
-        List<Size> GetSizes();
-        List<Taste> GetTastes();
         void CreateOrder([FromBody] OrderDetail orderDetail);
 
         void CreateCustomOrder([FromBody] CustomOrder customOrder);
