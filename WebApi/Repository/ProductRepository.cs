@@ -47,7 +47,7 @@ namespace WebApi.Repository
             productDetail.CategoryList = categoryList;
 
             // Taste
-            if (product.Id == 2) // Whip cream cake
+            if (product.Id == 3) // Whipped Cream cake
                 productDetail.TasteList = tasteList.Where(t => t.Id <= 3).ToList();
             else
                 productDetail.TasteList = new List<Taste>();
@@ -59,7 +59,7 @@ namespace WebApi.Repository
                 productDetail.SizeList = new List<Size>();
 
             // CakeType
-            if (product.Id == 7) // Custom Cake
+            if (product.Id == 1) // Custom Cake
                 productDetail.CakeTypeList = GetCakeTypes();
             else
                 productDetail.CakeTypeList = new List<CakeType>();
@@ -94,7 +94,7 @@ namespace WebApi.Repository
                 productDetail.CategoryList = categoryList;
 
                 // Taste
-                if (p.Id == 2) // Whip cream cake
+                if (p.Id == 3) // Whipped Cream cake
                     productDetail.TasteList = tasteList.Where(t => t.Id <= 3).ToList();
                 else
                     productDetail.TasteList = new List<Taste>();
@@ -106,7 +106,7 @@ namespace WebApi.Repository
                     productDetail.SizeList = new List<Size>();
 
                 // CakeType
-                if (p.Id == 7) // Custom Cake
+                if (p.Id == 1) // Custom Cake
                     productDetail.CakeTypeList = GetCakeTypes();
                 else
                     productDetail.CakeTypeList = new List<CakeType>();
@@ -145,7 +145,7 @@ namespace WebApi.Repository
                 productDetail.CategoryList = categoryList;
 
                 // Taste
-                if (p.Id == 2) // Whip cream cake
+                if (p.Id == 3) // Whipped Cream cake
                     productDetail.TasteList = tasteList.Where(t => t.Id <= 3).ToList();
                 else
                     productDetail.TasteList = new List<Taste>();
@@ -154,7 +154,7 @@ namespace WebApi.Repository
                 productDetail.SizeList = sizeList;
 
                 // CakeType
-                if (p.Id == 7) // Custom Cake
+                if (p.Id == 1) // Custom Cake
                     productDetail.CakeTypeList = GetCakeTypes();
                 else
                     productDetail.CakeTypeList = new List<CakeType>();
