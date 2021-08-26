@@ -44,9 +44,7 @@ namespace WebApi.Repository
             productDetail.CategoryId = product.CategoryId;
 
             // Taste
-            if (product.Id == 30) // Dacquoises combo
-                productDetail.TasteList = tasteList.Where(t => t.Id >= 4 && t.Id <= 9).ToList();
-            else if (product.Id == 2) // Wheap cream cake
+            if (product.Id == 2) // Whip cream cake
                 productDetail.TasteList = tasteList.Where(t => t.Id <= 3).ToList();
             else
                 productDetail.TasteList = new List<Taste>();
@@ -76,6 +74,7 @@ namespace WebApi.Repository
             List<Product> productList = GetProducts();
             List<Taste> tasteList = GetTastes();
             List<Size> sizeList = GetSizes();
+            List<Category> categoryList = GetCategories();
 
             ProductDetail productDetail;
             foreach (Product p in productList)
@@ -87,12 +86,12 @@ namespace WebApi.Repository
                 productDetail.Description = p.Description;
                 productDetail.ProductImage = p.ProductImage;
                 productDetail.Comment = p.Comment;
-                productDetail.CategoryId = p.CategoryId;
+
+                // Category
+                productDetail.CategoryList = categoryList;
 
                 // Taste
-                if (p.Id == 30) // Dacquoises combo
-                    productDetail.TasteList = tasteList.Where(t => t.Id >= 4 && t.Id <= 9).ToList();
-                else if (p.Id == 2) // Wheap cream cake
+                if (p.Id == 2) // Whip cream cake
                     productDetail.TasteList = tasteList.Where(t => t.Id <= 3).ToList();
                 else
                     productDetail.TasteList = new List<Taste>();
@@ -126,6 +125,7 @@ namespace WebApi.Repository
             List<Product> productList = GetProducts().Where(p => p.CategoryId == 1).ToList();
             List<Taste> tasteList = GetTastes();
             List<Size> sizeList = GetSizes();
+            List<Category> categoryList = GetCategories();
 
             ProductDetail productDetail;
             foreach (Product p in productList)
@@ -137,10 +137,12 @@ namespace WebApi.Repository
                 productDetail.Description = p.Description;
                 productDetail.ProductImage = p.ProductImage;
                 productDetail.Comment = p.Comment;
-                productDetail.CategoryId = p.CategoryId;
+
+                // Category
+                productDetail.CategoryList = categoryList;
 
                 // Taste
-                if (p.Id == 2) // Wheap cream cake
+                if (p.Id == 2) // Whip cream cake
                     productDetail.TasteList = tasteList.Where(t => t.Id <= 3).ToList();
                 else
                     productDetail.TasteList = new List<Taste>();
@@ -171,6 +173,7 @@ namespace WebApi.Repository
             List<Product> productList = GetProducts().Where(p => p.CategoryId == 2).ToList(); ;
             List<Taste> tasteList = GetTastes();
             List<Size> sizeList = GetSizes();
+            List<Category> categoryList = GetCategories();
 
             ProductDetail productDetail;
             foreach (Product p in productList)
@@ -182,13 +185,12 @@ namespace WebApi.Repository
                 productDetail.Description = p.Description;
                 productDetail.ProductImage = p.ProductImage;
                 productDetail.Comment = p.Comment;
-                productDetail.CategoryId = p.CategoryId;
+
+                // Category
+                productDetail.CategoryList = categoryList;
 
                 // Taste
-                if (p.Id == 30) // Dacquoises combo
-                    productDetail.TasteList = tasteList.Where(t => t.Id >= 4 && t.Id <= 9).ToList();
-                else
-                    productDetail.TasteList = new List<Taste>();
+                productDetail.TasteList = new List<Taste>();
 
                 // Size
                 productDetail.SizeList = new List<Size>();
@@ -225,6 +227,15 @@ namespace WebApi.Repository
         private List<CakeType> GetCakeTypes() 
         {
             return _bakingbunnyContext.CakeType.ToList();
+        }
+
+        /// <summary>
+        /// Retrieve all categories
+        /// </summary>
+        /// <returns>List<Category></returns>
+        private List<Category> GetCategories()
+        {
+            return _bakingbunnyContext.Category.ToList();
         }
 
         /// <summary>
@@ -298,8 +309,8 @@ namespace WebApi.Repository
                     {
                         Quantity = saleItem.Quantity,
                         Discount = 0,
-                        TasteId = saleItem.TasteId,
-                        SizeId = saleItem.SizeId,
+                        TasteId = saleItem.TasteId < 1 ? 1 : saleItem.TasteId,
+                        SizeId = saleItem.SizeId < 1 ? 1 : saleItem.SizeId,
                         OrderListId = orderList.Id,
                         ProductId = saleItem.ProductId,
                     });
@@ -339,8 +350,8 @@ namespace WebApi.Repository
                     RequestDate = customOrder.RequestDate,
                     Delivery = customOrder.Delivery,
                     UserId = user.Id,
-                    SizeId = customOrder.SizeId,
-                    TasteId = customOrder.TasteId,
+                    TasteId = customOrder.TasteId < 1 ? 1 : customOrder.TasteId,
+                    SizeId = customOrder.SizeId < 1 ? 1 : customOrder.SizeId,
                     CakeTypeId = customOrder.CakeTypeId,
                 });
 
