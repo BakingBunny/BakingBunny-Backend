@@ -34,6 +34,7 @@ namespace WebApi.Repository
             Product product = GetById(Id);
             List<Taste> tasteList = GetTastes();
             List<Size> sizeList = GetSizes();
+            List<Category> categoryList = GetCategories();
 
             productDetail.ProductId = product.Id;
             productDetail.ProductName = product.Name;
@@ -41,7 +42,9 @@ namespace WebApi.Repository
             productDetail.Description = product.Description;
             productDetail.ProductImage = product.ProductImage;
             productDetail.Comment = product.Comment;
-            productDetail.CategoryId = product.CategoryId;
+
+            // Category
+            productDetail.CategoryList = categoryList;
 
             // Taste
             if (product.Id == 2) // Whip cream cake
