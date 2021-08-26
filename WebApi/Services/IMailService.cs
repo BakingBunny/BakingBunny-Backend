@@ -10,7 +10,7 @@ namespace WebApi.Services
     {
         Task SendInternalEmailRegularAsync(OrderDetail orderDetail, int orderId, List<Product> products);
         Task SendEmailToClientRegularAsync(OrderDetail orderDetail, int orderId, List<Product> products);
-        Task SendInternalEmailCustomAsync(CustomOrder customOrder);
-        Task SendEmailToClientCustomAsync(CustomOrder customOrder);
+        Task SendInternalEmailCustomAsync(CustomOrder customOrder, Size customOrderSize, Taste customOrderTaste, CakeType customOrderCakeType);
+        Task SendEmailToClientCustomAsync(CustomOrder customOrder, Size customOrderSize, Taste customOrderTaste, CakeType customOrderCakeType);
     }
 }

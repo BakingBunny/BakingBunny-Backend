@@ -12,10 +12,10 @@ namespace WebApi.Repository
         List<ProductDetail> GetAll();
         List<ProductDetail> GetCakes();
         List<ProductDetail> GetDacquoises();
-        List<Size> GetSizes();
-        List<Taste> GetTastes();
+        ProductDetail GetProductById(int Id);
         void CreateOrder([FromBody] OrderDetail orderDetail);
 
         void CreateCustomOrder([FromBody] CustomOrder customOrder);
+        int CalculateDeliveryFee(string postalCode);
     }
 }

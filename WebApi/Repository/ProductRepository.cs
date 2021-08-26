@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json.Linq;
 using NLog;
 using NLog.Web;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -17,11 +19,51 @@ namespace WebApi.Repository
     {
         private readonly BakingbunnyContext _bakingbunnyContext;
         private readonly IMailService _mailService;
+        private readonly IHttpClientFactory _clientFactory;
 
-        public ProductRepository(BakingbunnyContext bakingbunnyContext, IMailService mailService)
+        public ProductRepository(BakingbunnyContext bakingbunnyContext, IMailService mailService, IHttpClientFactory clientFactory)
         {
             _bakingbunnyContext = bakingbunnyContext;
             _mailService = mailService;
+            _clientFactory = clientFactory;
+        }
+
+        public ProductDetail GetProductById(int Id)
+        {
+            ProductDetail productDetail = new ProductDetail();
+            Product product = GetById(Id);
+            List<Taste> tasteList = GetTastes();
+            List<Size> sizeList = GetSizes();
+
+            productDetail.ProductId = product.Id;
+            productDetail.ProductName = product.Name;
+            productDetail.Price = product.Price;
+            productDetail.Description = product.Description;
+            productDetail.ProductImage = product.ProductImage;
+            productDetail.Comment = product.Comment;
+            productDetail.CategoryId = product.CategoryId;
+
+            // Taste
+            if (product.Id == 30) // Dacquoises combo
+                productDetail.TasteList = tasteList.Where(t => t.Id >= 4 && t.Id <= 9).ToList();
+            else if (product.Id == 2) // Wheap cream cake
+                productDetail.TasteList = tasteList.Where(t => t.Id <= 3).ToList();
+            else
+                productDetail.TasteList = new List<Taste>();
+
+            // Size
+            if (product.CategoryId == 1) // Cake
+                productDetail.SizeList = sizeList;
+            else
+                productDetail.SizeList = new List<Size>();
+
+            // CakeType
+            if (product.Id == 7) // Custom Cake
+                productDetail.CakeTypeList = GetCakeTypes();
+            else
+                productDetail.CakeTypeList = new List<CakeType>();
+
+            return productDetail;
         }
 
         /// <summary>
@@ -48,18 +90,24 @@ namespace WebApi.Repository
                 productDetail.CategoryId = p.CategoryId;
 
                 // Taste
-                if (p.Id == 29)
+                if (p.Id == 30) // Dacquoises combo
                     productDetail.TasteList = tasteList.Where(t => t.Id >= 4 && t.Id <= 9).ToList();
-                else if (p.Id == 2)
+                else if (p.Id == 2) // Wheap cream cake
                     productDetail.TasteList = tasteList.Where(t => t.Id <= 3).ToList();
                 else
                     productDetail.TasteList = new List<Taste>();
 
                 // Size
-                if (p.CategoryId == 1)
+                if (p.CategoryId == 1) // Cake
                     productDetail.SizeList = sizeList;
                 else
                     productDetail.SizeList = new List<Size>();
+
+                // CakeType
+                if (p.Id == 7) // Custom Cake
+                    productDetail.CakeTypeList = GetCakeTypes();
+                else
+                    productDetail.CakeTypeList = new List<CakeType>();
 
                 productDetailList.Add(productDetail);
             }
@@ -92,15 +140,19 @@ namespace WebApi.Repository
                 productDetail.CategoryId = p.CategoryId;
 
                 // Taste
-                if (p.Id == 29)
-                    productDetail.TasteList = tasteList.Where(t => t.Id >= 4 && t.Id <= 9).ToList();
-                else if (p.Id == 2)
+                if (p.Id == 2) // Wheap cream cake
                     productDetail.TasteList = tasteList.Where(t => t.Id <= 3).ToList();
                 else
                     productDetail.TasteList = new List<Taste>();
 
                 // Size
                 productDetail.SizeList = sizeList;
+
+                // CakeType
+                if (p.Id == 7) // Custom Cake
+                    productDetail.CakeTypeList = GetCakeTypes();
+                else
+                    productDetail.CakeTypeList = new List<CakeType>();
 
                 productDetailList.Add(productDetail);
             }
@@ -133,10 +185,8 @@ namespace WebApi.Repository
                 productDetail.CategoryId = p.CategoryId;
 
                 // Taste
-                if (p.Id == 29)
+                if (p.Id == 30) // Dacquoises combo
                     productDetail.TasteList = tasteList.Where(t => t.Id >= 4 && t.Id <= 9).ToList();
-                else if (p.Id == 2)
-                    productDetail.TasteList = tasteList.Where(t => t.Id <= 3).ToList();
                 else
                     productDetail.TasteList = new List<Taste>();
 
@@ -154,7 +204,7 @@ namespace WebApi.Repository
         /// Retrieve all sizes
         /// </summary>
         /// <returns>List<Size></returns>
-        public List<Size> GetSizes()
+        private List<Size> GetSizes()
         {
             return _bakingbunnyContext.Size.ToList();
         }
@@ -163,9 +213,27 @@ namespace WebApi.Repository
         /// Retrieve all fruits
         /// </summary>
         /// <returns>List<Fruit></returns>
-        public List<Taste> GetTastes()
+        private List<Taste> GetTastes()
         {
             return _bakingbunnyContext.Taste.ToList();
+        }
+
+        /// <summary>
+        /// Retrieve all cake types
+        /// </summary>
+        /// <returns>List<CakeType></returns>
+        private List<CakeType> GetCakeTypes() 
+        {
+            return _bakingbunnyContext.CakeType.ToList();
+        }
+
+        /// <summary>
+        /// Retrieve a Product object by Id
+        /// </summary>
+        /// <returns>Product</returns>
+        private Product GetById(int Id)
+        {
+            return _bakingbunnyContext.Product.Where(s => s.Active).Where(p => p.Id == Id).FirstOrDefault();
         }
 
         /// <summary>
@@ -205,14 +273,20 @@ namespace WebApi.Repository
                     subTotal += p.Price * saleItem.Quantity;
                 }
 
+                string postalCode = orderDetail.user.PostalCode.ToLower();
+                postalCode = postalCode.Replace(" ", "");
+                Delivery delivery = FindDeliveryFee(postalCode);
+                int deliveryFee = delivery == null ? 0 : delivery.DeliveryFee;
+                orderDetail.orderList.DeliveryFee = deliveryFee;
+
                 OrderList orderList = new OrderList()
                 {
                     PickupDeliveryDate = orderDetail.orderList.PickupDeliveryDate,
                     Delivery = orderDetail.orderList.Delivery,
-                    DeliveryFee = orderDetail.orderList.DeliveryFee,
+                    DeliveryFee = deliveryFee,
                     OrderDate = DateTime.Now,
                     Subtotal = (float)subTotal,
-                    Total = (float)subTotal + orderDetail.orderList.DeliveryFee,
+                    Total = (float)subTotal + deliveryFee,
                     UserId = user.Id,
                 };
                 dbContext.Add(orderList);
@@ -261,9 +335,9 @@ namespace WebApi.Repository
 
                 dbContext.Add(new CustomOrder()
                 {
-                    ExampleImage = customOrder.ExampleImage,
-                    Message = customOrder.Message,
-                    Comment = customOrder.Comment,
+                    RequestDescription = customOrder.RequestDescription,
+                    RequestDate = customOrder.RequestDate,
+                    Delivery = customOrder.Delivery,
                     UserId = user.Id,
                     SizeId = customOrder.SizeId,
                     TasteId = customOrder.TasteId,
@@ -273,8 +347,109 @@ namespace WebApi.Repository
                 dbContext.SaveChanges();
             }
 
-            _mailService.SendEmailToClientCustomAsync(customOrder);
-            _mailService.SendInternalEmailCustomAsync(customOrder);
+            Size customOrderSize = _bakingbunnyContext.Size.Where(s => s.Id == customOrder.SizeId).FirstOrDefault();
+            Taste customOrderTaste = _bakingbunnyContext.Taste.Where(t => t.Id == customOrder.TasteId).FirstOrDefault();
+            CakeType customOrderCakeType = _bakingbunnyContext.CakeType.Where(c => c.Id == customOrder.CakeTypeId).FirstOrDefault();
+
+            _mailService.SendEmailToClientCustomAsync(customOrder, customOrderSize, customOrderTaste, customOrderCakeType);
+            _mailService.SendInternalEmailCustomAsync(customOrder, customOrderSize, customOrderTaste, customOrderCakeType);
+        }
+
+        public int CalculateDeliveryFee(string postalCode)
+        {
+            int distance = -1;
+            int deliveryFee = -1;
+
+            postalCode = postalCode.Replace(" ", "");
+            postalCode = postalCode.ToLower();
+
+            Delivery delivery = FindDeliveryFee(postalCode);
+
+            if (delivery != null)
+            {
+                return delivery.DeliveryFee;
+            }
+            else
+            {
+                distance = GetDistance(postalCode);
+
+                if (distance < 0)
+                    deliveryFee = -1;
+                else if (distance < 5000)
+                    deliveryFee = 0;
+                else if (distance < 10000)
+                    deliveryFee = 3;
+                else if (distance < 15000)
+                    deliveryFee = 5;
+                else if (distance < 20000)
+                    deliveryFee = 7;
+                else if (distance < 25000)
+                    deliveryFee = 10;
+                else
+                    deliveryFee = -1;
+
+                if (deliveryFee > -1)
+                {
+                    AddDeliveryInfo(new Delivery()
+                    {
+                        PostalCode = postalCode,
+                        DeliveryFee = deliveryFee,
+                        Distance = distance
+                    });
+                }
+            }
+
+            return deliveryFee;
+        }
+
+        private int GetDistance (string postalCode)
+        {
+#if (DEBUG)
+            //postalCode = "T2Y3E4";
+            //postalCode = "T3M3A7";
+#endif
+
+            string url = "https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&origins=T2P3P3&destinations=" + postalCode + "&departure_time=now&key=AIzaSyCq7_wnyksRIYf6kOhCQ555TDZT0TKoeQY";
+            var request = new HttpRequestMessage(HttpMethod.Get, url);
+
+            var client = _clientFactory.CreateClient();
+            var response = client.Send(request);
+
+            int distance = 0; // Distance in meters
+
+            if (response.IsSuccessStatusCode)
+            {
+                using (var responseStream = response.Content.ReadAsStream())
+                {
+                    using (StreamReader reader = new StreamReader(responseStream))
+                    {
+                        string jsonResponse = reader.ReadToEnd();
+                        JToken destination = JObject.Parse(jsonResponse) ["destination_addresses"] [0];
+                        
+                        //if (!destination.HasValues)
+                        if (destination == null)
+                            return -1;
+
+                        JToken jToken = JObject.Parse(jsonResponse) ["rows"] [0] ["elements"] [0] ["distance"];
+                        distance = jToken ["value"].Value<int>();
+                    }
+                }
+            }
+            return distance;
+        }
+
+        private Delivery FindDeliveryFee (string postalCode)
+        {
+            return _bakingbunnyContext.Delivery.Where(d => d.PostalCode.Equals(postalCode)).FirstOrDefault();
+        }
+
+        private void AddDeliveryInfo(Delivery delivery)
+        {
+            using (var dbContext = new BakingbunnyContext())
+            {
+                dbContext.Add(delivery);
+                dbContext.SaveChanges();
+            }
         }
     }
 }

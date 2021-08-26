@@ -26,10 +26,6 @@ namespace WebApi
             {
                 logger.Error(ex, "The program could not launch due to exception.");
             }
-            finally
-            {
-                NLog.LogManager.Shutdown();
-            }
         }
 
         public static IHostBuilder CreateHostBuilder(string [] args) =>

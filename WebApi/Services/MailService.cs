@@ -24,7 +24,7 @@ namespace WebApi.Services
         /// </summary>
         /// <param name="customOrder"></param>
         /// <returns></returns>
-        public async Task SendInternalEmailCustomAsync(CustomOrder customOrder)
+        public async Task SendInternalEmailCustomAsync(CustomOrder customOrder, Size customOrderSize, Taste customOrderTaste, CakeType customOrderCakeType)
         {
             var email = new MimeMessage();
             email.Sender = MailboxAddress.Parse(_mailSettings.Mail);
@@ -39,9 +39,12 @@ namespace WebApi.Services
                 "<strong>Address</strong>: " + customOrder.User.Address + "<br>" +
                 "<strong>PostalCode</strong>: " + customOrder.User.PostalCode + "<br>" +
                 "<strong>City</strong>: " + customOrder.User.City + "<br>" +
-                "<strong>Example Image</strong>: " + customOrder.ExampleImage + "<br>" + // Need to review this line.
-                "<strong>Message on the cake</strong>: " + customOrder.Message + "<br>" +
-                "<strong>Comment</strong>: " + customOrder.Comment + "<br>";
+                "<strong>Description</strong>: " + customOrder.RequestDescription + "<br>" +
+                "<strong>Order Date</strong>: " + customOrder.RequestDate + "<br>" +
+                "<strong>Cake Size</strong>: " + customOrderSize.SizeName + "<br>" +
+                "<strong>Cake Taste</strong>: " + customOrderTaste.TasteName + "<br>" +
+                "<strong>Cake Type</strong>: " + customOrderCakeType.Type + "<br>";
+
             //builder.TextBody = "";
             email.Body = builder.ToMessageBody();
             using var smtp = new SmtpClient();
@@ -56,7 +59,7 @@ namespace WebApi.Services
         /// </summary>
         /// <param name="customOrder"></param>
         /// <returns></returns>
-        public async Task SendEmailToClientCustomAsync(CustomOrder customOrder)
+        public async Task SendEmailToClientCustomAsync(CustomOrder customOrder, Size customOrderSize, Taste customOrderTaste, CakeType customOrderCakeType)
         {
             var email = new MimeMessage();
             email.Sender = MailboxAddress.Parse(_mailSettings.Mail);
@@ -104,7 +107,8 @@ namespace WebApi.Services
                 "<strong>Name</strong>: " + orderDetail.user.Firstname + " " + orderDetail.user.Lastname + "<br>" +
                 "<strong>Email</strong>: " + orderDetail.user.Email + "<br>" +
                 "<strong>Phone</strong>: " + orderDetail.user.Phone + "<br>" +
-                "<strong>Delivery</strong>: " + (orderDetail.orderList.Delivery ? "Yes<br>" : "No<br>");
+                "<strong>Delivery</strong>: " + (orderDetail.orderList.Delivery ? "Yes<br>" : "No<br>") +
+                "<strong>Allergy</strong>: " + orderDetail.orderList.Allergy + "<br>";
 
                 if (orderDetail.orderList.Delivery)
                     htmlBodyString += "<strong>Delivery Date</strong>: " + orderDetail.orderList.PickupDeliveryDate + "<br>";

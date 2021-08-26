@@ -11,7 +11,8 @@ using WebApi.Services;
 
 namespace WebApiCrud.Controllers
 {
-    [Route("api/[controller]")]
+    //[Route("api/[controller]")]
+    //[Route("api/category")]
     [ApiController]
     public class ProductController : ControllerBase
     {
@@ -26,6 +27,7 @@ namespace WebApiCrud.Controllers
             _logger = logger;
         }
 
+        [Route("api/[controller]")]
         [HttpGet]
         public List<ProductDetail> GetAll()
         {
@@ -40,7 +42,21 @@ namespace WebApiCrud.Controllers
             }
         }
 
-        [HttpGet("cake")]
+        [HttpGet("api/[controller]/{id}")]
+        public ProductDetail GetProductById(int Id)
+        {
+            try
+            {
+                return _productRepository.GetProductById(Id);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while executing GetProductById method");
+                return null;
+            }
+        }
+
+        [HttpGet("api/category/cakes")]
         public List<ProductDetail> GetCakes()
         {
             try
@@ -54,7 +70,7 @@ namespace WebApiCrud.Controllers
             }
         }
 
-        [HttpGet("dacq")]
+        [HttpGet("api/category/dacquoises")]
         public List<ProductDetail> GetDacquoises()
         {
             try
@@ -69,7 +85,7 @@ namespace WebApiCrud.Controllers
             
         }
 
-        [HttpPost("order")]
+        [HttpPost("api/order")]
         public void CreateOrder([FromBody] OrderDetail orderDetail)
         {
             try
@@ -82,7 +98,7 @@ namespace WebApiCrud.Controllers
             } 
         }
 
-        [HttpPost("customorder")]
+        [HttpPost("api/customorder")]
         public void CreateCustomOrder([FromBody] CustomOrder customOrder)
         {
             try
@@ -93,7 +109,20 @@ namespace WebApiCrud.Controllers
             {
                 _logger.LogError(ex, "Error while executing CustomOrder method");
             }
-            
+        }
+
+        [HttpGet("api/delivery/{postalCode}")]
+        public double CalculateDeliveryFee(string postalCode)
+        {
+            try
+            {
+                return _productRepository.CalculateDeliveryFee(postalCode);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while executing CalculateDeliveryFee method");
+                return -1;
+            }
         }
     }
 }
