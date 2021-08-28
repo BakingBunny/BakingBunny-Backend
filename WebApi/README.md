@@ -2,7 +2,7 @@
 
 This repository shows the backend (.NET Core 5 Web API) for Baking Bunny Project.
 
-## How-to's
+## Basic setup
 
 ### Update DB connection string
 
