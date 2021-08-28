@@ -13,7 +13,7 @@ namespace WebApi.Models
         public string Description { get; set; }
         public string ProductImage { get; set; }
         public string Comment { get; set; }
-        public List<Category> CategoryList { get; set; }
+        public Category Category { get; set; }
         public List<Taste> TasteList { get; set; }
         public List<Size> SizeList { get; set; }
         public List<CakeType> CakeTypeList { get; set; }

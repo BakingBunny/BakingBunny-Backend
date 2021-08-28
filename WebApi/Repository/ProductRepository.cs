@@ -34,7 +34,6 @@ namespace WebApi.Repository
             Product product = GetById(Id);
             List<Taste> tasteList = GetTastes();
             List<Size> sizeList = GetSizes();
-            List<Category> categoryList = GetCategories();
 
             productDetail.ProductId = product.Id;
             productDetail.ProductName = product.Name;
@@ -44,7 +43,7 @@ namespace WebApi.Repository
             productDetail.Comment = product.Comment;
 
             // Category
-            productDetail.CategoryList = categoryList;
+            productDetail.Category = GetCategory(product.CategoryId);
 
             // Taste
             if (product.Id == 3) // Whipped Cream cake
@@ -77,7 +76,6 @@ namespace WebApi.Repository
             List<Product> productList = GetProducts();
             List<Taste> tasteList = GetTastes();
             List<Size> sizeList = GetSizes();
-            List<Category> categoryList = GetCategories();
 
             ProductDetail productDetail;
             foreach (Product p in productList)
@@ -91,7 +89,7 @@ namespace WebApi.Repository
                 productDetail.Comment = p.Comment;
 
                 // Category
-                productDetail.CategoryList = categoryList;
+                productDetail.Category = GetCategory(p.CategoryId);
 
                 // Taste
                 if (p.Id == 3) // Whipped Cream cake
@@ -128,7 +126,6 @@ namespace WebApi.Repository
             List<Product> productList = GetProducts().Where(p => p.CategoryId == 1).ToList();
             List<Taste> tasteList = GetTastes();
             List<Size> sizeList = GetSizes();
-            List<Category> categoryList = GetCategories();
 
             ProductDetail productDetail;
             foreach (Product p in productList)
@@ -142,7 +139,7 @@ namespace WebApi.Repository
                 productDetail.Comment = p.Comment;
 
                 // Category
-                productDetail.CategoryList = categoryList;
+                productDetail.Category = GetCategory(p.CategoryId);
 
                 // Taste
                 if (p.Id == 3) // Whipped Cream cake
@@ -176,7 +173,6 @@ namespace WebApi.Repository
             List<Product> productList = GetProducts().Where(p => p.CategoryId == 2).ToList(); ;
             List<Taste> tasteList = GetTastes();
             List<Size> sizeList = GetSizes();
-            List<Category> categoryList = GetCategories();
 
             ProductDetail productDetail;
             foreach (Product p in productList)
@@ -190,7 +186,7 @@ namespace WebApi.Repository
                 productDetail.Comment = p.Comment;
 
                 // Category
-                productDetail.CategoryList = categoryList;
+                productDetail.Category = GetCategory(p.CategoryId);
 
                 // Taste
                 productDetail.TasteList = new List<Taste>();
@@ -233,12 +229,12 @@ namespace WebApi.Repository
         }
 
         /// <summary>
-        /// Retrieve all categories
+        /// Retrieve corresponding category object
         /// </summary>
-        /// <returns>List<Category></returns>
-        private List<Category> GetCategories()
+        /// <returns>Category</returns>
+        private Category GetCategory(int id)
         {
-            return _bakingbunnyContext.Category.ToList();
+            return _bakingbunnyContext.Category.Where(c => c.Id == id).FirstOrDefault();
         }
 
         /// <summary>
@@ -293,9 +289,12 @@ namespace WebApi.Repository
                 int deliveryFee = delivery == null ? 0 : delivery.DeliveryFee;
                 orderDetail.orderList.DeliveryFee = deliveryFee;
 
+                DateTime targetDateTime = TimeZoneInfo.ConvertTime(orderDetail.orderList.PickupDeliveryDate, TimeZoneInfo.FindSystemTimeZoneById("Mountain Standard Time"));
+                orderDetail.orderList.PickupDeliveryDate = targetDateTime;
+
                 OrderList orderList = new OrderList()
                 {
-                    PickupDeliveryDate = orderDetail.orderList.PickupDeliveryDate,
+                    PickupDeliveryDate = targetDateTime,
                     Delivery = orderDetail.orderList.Delivery,
                     DeliveryFee = deliveryFee,
                     OrderDate = DateTime.Now,
@@ -347,10 +346,13 @@ namespace WebApi.Repository
                 dbContext.Add(user);
                 dbContext.SaveChanges();
 
+                DateTime targetDateTime = TimeZoneInfo.ConvertTime(customOrder.RequestDate, TimeZoneInfo.FindSystemTimeZoneById("Mountain Standard Time"));
+                customOrder.RequestDate = targetDateTime;
+
                 dbContext.Add(new CustomOrder()
                 {
                     RequestDescription = customOrder.RequestDescription,
-                    RequestDate = customOrder.RequestDate,
+                    RequestDate = targetDateTime,
                     Delivery = customOrder.Delivery,
                     UserId = user.Id,
                     TasteId = customOrder.TasteId < 1 ? 1 : customOrder.TasteId,
