@@ -29,85 +29,110 @@ namespace WebApiCrud.Controllers
 
         [Route("api/[controller]")]
         [HttpGet]
-        public List<ProductDetail> GetAll()
+        //public List<ProductDetail> GetAll()
+        public async Task<IActionResult> GetAll()
         {
             try
             {
-                return _productRepository.GetAll();
+                return Ok(await _productRepository.GetAll());
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error while executing GetAll method");
-                return null;
+                return StatusCode(500, "Internal server error");
             }
         }
 
         [HttpGet("api/[controller]/{id}")]
-        public ProductDetail GetProductById(int Id)
+        public async Task<IActionResult> GetProductById(int Id)
         {
             try
             {
-                return _productRepository.GetProductById(Id);
+                return Ok(await _productRepository.GetProductById(Id));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error while executing GetProductById method");
-                return null;
+                return StatusCode(500, "Internal server error");
             }
         }
 
         [HttpGet("api/category/cakes")]
-        public List<ProductDetail> GetCakes()
+        public async Task<IActionResult> GetCakes()
         {
             try
             {
-                return _productRepository.GetCakes();
+                return Ok(await _productRepository.GetCakes());
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error while executing GetCakes method");
-                return null;
+                return StatusCode(500, "Internal server error");
             }
         }
 
         [HttpGet("api/category/dacquoises")]
-        public List<ProductDetail> GetDacquoises()
+        public async Task<IActionResult> GetDacquoises()
         {
             try
             {
-                return _productRepository.GetDacquoises();
+                return Ok(await _productRepository.GetDacquoises());
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error while executing GetDacquoises method");
-                return null;
+                return StatusCode(500, "Internal server error");
             }
             
         }
 
         [HttpPost("api/order")]
-        public void CreateOrder([FromBody] OrderDetail orderDetail)
+        public IActionResult CreateOrder([FromBody] OrderDetail orderDetail)
         {
             try
             {
+                if (orderDetail == null)
+                {
+                    _logger.LogError("OrderDetail object is null");
+                    return BadRequest("Internal server error");
+                }
+                else if (!ModelState.IsValid)
+                {
+                    _logger.LogError("Invalid OrderDetail object");
+                    return BadRequest("Internal server error");
+                }
                 _productRepository.CreateOrder(orderDetail);
+                return Ok();
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error while executing CreateOrder method");
+                return BadRequest("Internal server error");
             } 
         }
 
         [HttpPost("api/customorder")]
-        public void CreateCustomOrder([FromBody] CustomOrder customOrder)
+        public IActionResult CreateCustomOrder([FromBody] CustomOrder customOrder)
         {
             try
             {
+                if (customOrder == null)
+                {
+                    _logger.LogError("CustomOrder object is null");
+                    return BadRequest("Internal server error");
+                }
+                else if (!ModelState.IsValid)
+                {
+                    _logger.LogError("Invalid CustomOrder object");
+                    return BadRequest("Internal server error");
+                }
                 _productRepository.CreateCustomOrder(customOrder);
+                return Ok();
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error while executing CustomOrder method");
+                return BadRequest("Internal server error");
             }
         }
 

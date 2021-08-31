@@ -10,6 +10,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using TimeZoneConverter;
 using WebApi.Models;
 using WebApi.Services;
 
@@ -28,12 +29,12 @@ namespace WebApi.Repository
             _clientFactory = clientFactory;
         }
 
-        public ProductDetail GetProductById(int Id)
+        public async Task<ProductDetail> GetProductById(int Id)
         {
             ProductDetail productDetail = new ProductDetail();
-            Product product = GetById(Id);
-            List<Taste> tasteList = GetTastes();
-            List<Size> sizeList = GetSizes();
+            Product product = await GetById(Id);
+            List<Taste> tasteList = (List<Taste>)await GetTastes();
+            List<Size> sizeList = await GetSizes();
 
             productDetail.ProductId = product.Id;
             productDetail.ProductName = product.Name;
@@ -43,7 +44,7 @@ namespace WebApi.Repository
             productDetail.Comment = product.Comment;
 
             // Category
-            productDetail.Category = GetCategory(product.CategoryId);
+            productDetail.Category = await GetCategory(product.CategoryId);
 
             // Taste
             if (product.Id == 3) // Whipped Cream cake
@@ -59,7 +60,7 @@ namespace WebApi.Repository
 
             // CakeType
             if (product.Id == 1) // Custom Cake
-                productDetail.CakeTypeList = GetCakeTypes();
+                productDetail.CakeTypeList = await GetCakeTypes();
             else
                 productDetail.CakeTypeList = new List<CakeType>();
 
@@ -70,12 +71,13 @@ namespace WebApi.Repository
         /// Get all product details for frontend
         /// </summary>
         /// <returns>List<ProductDetail></returns>
-        public List<ProductDetail> GetAll()
+        //public List<ProductDetail> GetAll()
+        public async Task<List<ProductDetail>> GetAll()
         {
             List<ProductDetail> productDetailList = new List<ProductDetail>();
-            List<Product> productList = GetProducts();
-            List<Taste> tasteList = GetTastes();
-            List<Size> sizeList = GetSizes();
+            List<Product> productList = await GetProducts();
+            List<Taste> tasteList = await GetTastes();
+            List<Size> sizeList = await GetSizes();
 
             ProductDetail productDetail;
             foreach (Product p in productList)
@@ -89,7 +91,7 @@ namespace WebApi.Repository
                 productDetail.Comment = p.Comment;
 
                 // Category
-                productDetail.Category = GetCategory(p.CategoryId);
+                 productDetail.Category = await GetCategory(p.CategoryId);
 
                 // Taste
                 if (p.Id == 3) // Whipped Cream cake
@@ -105,7 +107,7 @@ namespace WebApi.Repository
 
                 // CakeType
                 if (p.Id == 1) // Custom Cake
-                    productDetail.CakeTypeList = GetCakeTypes();
+                    productDetail.CakeTypeList = await GetCakeTypes();
                 else
                     productDetail.CakeTypeList = new List<CakeType>();
 
@@ -120,15 +122,15 @@ namespace WebApi.Repository
         /// Retrieve only cake list
         /// </summary>
         /// <returns>List<ProductDetail></returns>
-        public List<ProductDetail> GetCakes()
+        public async Task<List<ProductDetail>> GetCakes()
         {
             List<ProductDetail> productDetailList = new List<ProductDetail>();
-            List<Product> productList = GetProducts().Where(p => p.CategoryId == 1).ToList();
-            List<Taste> tasteList = GetTastes();
-            List<Size> sizeList = GetSizes();
+            List<Product> productList = await GetProducts();
+            List<Taste> tasteList = await GetTastes();
+            List<Size> sizeList = await GetSizes();
 
             ProductDetail productDetail;
-            foreach (Product p in productList)
+            foreach (Product p in productList.Where(p => p.CategoryId == 1).ToList())
             {
                 productDetail = new ProductDetail();
                 productDetail.ProductId = p.Id;
@@ -139,7 +141,7 @@ namespace WebApi.Repository
                 productDetail.Comment = p.Comment;
 
                 // Category
-                productDetail.Category = GetCategory(p.CategoryId);
+                 productDetail.Category = await GetCategory(p.CategoryId);
 
                 // Taste
                 if (p.Id == 3) // Whipped Cream cake
@@ -152,7 +154,7 @@ namespace WebApi.Repository
 
                 // CakeType
                 if (p.Id == 1) // Custom Cake
-                    productDetail.CakeTypeList = GetCakeTypes();
+                    productDetail.CakeTypeList = await GetCakeTypes();
                 else
                     productDetail.CakeTypeList = new List<CakeType>();
 
@@ -167,15 +169,15 @@ namespace WebApi.Repository
         /// Retrieve only dacquoise list
         /// </summary>
         /// <returns>List<ProductDetail></returns>
-        public List<ProductDetail> GetDacquoises()
+        public async Task<List<ProductDetail>> GetDacquoises()
         {
             List<ProductDetail> productDetailList = new List<ProductDetail>();
-            List<Product> productList = GetProducts().Where(p => p.CategoryId == 2).ToList(); ;
-            List<Taste> tasteList = GetTastes();
-            List<Size> sizeList = GetSizes();
+            List<Product> productList = await GetProducts();
+            List<Taste> tasteList = await GetTastes();
+            List<Size> sizeList = await GetSizes();
 
             ProductDetail productDetail;
-            foreach (Product p in productList)
+            foreach (Product p in productList.Where(p => p.CategoryId == 2).ToList())
             {
                 productDetail = new ProductDetail();
                 productDetail.ProductId = p.Id;
@@ -186,7 +188,7 @@ namespace WebApi.Repository
                 productDetail.Comment = p.Comment;
 
                 // Category
-                productDetail.Category = GetCategory(p.CategoryId);
+                productDetail.Category = await GetCategory(p.CategoryId);
 
                 // Taste
                 productDetail.TasteList = new List<Taste>();
@@ -205,54 +207,54 @@ namespace WebApi.Repository
         /// Retrieve all sizes
         /// </summary>
         /// <returns>List<Size></returns>
-        private List<Size> GetSizes()
+        private async Task<List<Size>> GetSizes()
         {
-            return _bakingbunnyContext.Size.ToList();
+            return await _bakingbunnyContext.Size.ToListAsync();
         }
 
         /// <summary>
         /// Retrieve all fruits
         /// </summary>
         /// <returns>List<Fruit></returns>
-        private List<Taste> GetTastes()
+        private async Task<List<Taste>> GetTastes()
         {
-            return _bakingbunnyContext.Taste.ToList();
+            return await _bakingbunnyContext.Taste.ToListAsync();
         }
 
         /// <summary>
         /// Retrieve all cake types
         /// </summary>
         /// <returns>List<CakeType></returns>
-        private List<CakeType> GetCakeTypes() 
+        private async Task <List<CakeType>> GetCakeTypes()
         {
-            return _bakingbunnyContext.CakeType.ToList();
+            return await _bakingbunnyContext.CakeType.ToListAsync();
         }
 
         /// <summary>
         /// Retrieve corresponding category object
         /// </summary>
         /// <returns>Category</returns>
-        private Category GetCategory(int id)
+        private async Task<Category> GetCategory(int id)
         {
-            return _bakingbunnyContext.Category.Where(c => c.Id == id).FirstOrDefault();
+            return await _bakingbunnyContext.Category.Where(c => c.Id == id).FirstOrDefaultAsync();
         }
 
         /// <summary>
         /// Retrieve a Product object by Id
         /// </summary>
         /// <returns>Product</returns>
-        private Product GetById(int Id)
+        private async Task<Product> GetById(int Id)
         {
-            return _bakingbunnyContext.Product.Where(s => s.Active).Where(p => p.Id == Id).FirstOrDefault();
+            return await _bakingbunnyContext.Product.Where(s => s.Active).Where(p => p.Id == Id).FirstOrDefaultAsync();
         }
 
         /// <summary>
         /// Just for email method to provide product data.
         /// </summary>
         /// <returns>List<Product></returns>
-        private List<Product> GetProducts()
+        private async Task<List<Product>> GetProducts()
         {
-            return _bakingbunnyContext.Product.Where(s => s.Active).ToList();
+            return await _bakingbunnyContext.Product.Where(s => s.Active).ToListAsync();
         }
 
         /// <summary>
@@ -289,7 +291,8 @@ namespace WebApi.Repository
                 int deliveryFee = delivery == null ? 0 : delivery.DeliveryFee;
                 orderDetail.orderList.DeliveryFee = deliveryFee;
 
-                DateTime targetDateTime = TimeZoneInfo.ConvertTime(orderDetail.orderList.PickupDeliveryDate, TimeZoneInfo.FindSystemTimeZoneById("Mountain Standard Time"));
+                TimeZoneInfo mountainTimeZone = TZConvert.GetTimeZoneInfo("Mountain Standard Time");
+                DateTime targetDateTime = TimeZoneInfo.ConvertTime(orderDetail.orderList.PickupDeliveryDate, mountainTimeZone);
                 orderDetail.orderList.PickupDeliveryDate = targetDateTime;
 
                 OrderList orderList = new OrderList()
@@ -319,9 +322,10 @@ namespace WebApi.Repository
 
                     dbContext.SaveChanges();
                 }
-
+#if(!DEBUG)
                 _mailService.SendEmailToClientRegularAsync(orderDetail, orderList.Id, GetProducts());
                 _mailService.SendInternalEmailRegularAsync(orderDetail, orderList.Id, GetProducts());
+#endif
             }
         }
 
@@ -346,7 +350,8 @@ namespace WebApi.Repository
                 dbContext.Add(user);
                 dbContext.SaveChanges();
 
-                DateTime targetDateTime = TimeZoneInfo.ConvertTime(customOrder.RequestDate, TimeZoneInfo.FindSystemTimeZoneById("Mountain Standard Time"));
+                TimeZoneInfo mountainTimeZone = TZConvert.GetTimeZoneInfo("Mountain Standard Time");
+                DateTime targetDateTime = TimeZoneInfo.ConvertTime(customOrder.RequestDate, mountainTimeZone);
                 customOrder.RequestDate = targetDateTime;
 
                 dbContext.Add(new CustomOrder()
@@ -357,7 +362,7 @@ namespace WebApi.Repository
                     UserId = user.Id,
                     TasteId = customOrder.TasteId < 1 ? 1 : customOrder.TasteId,
                     SizeId = customOrder.SizeId < 1 ? 1 : customOrder.SizeId,
-                    CakeTypeId = customOrder.CakeTypeId,
+                    CakeTypeId = customOrder.CakeTypeId < 1 ? 1 : customOrder.CakeTypeId,
                 });
 
                 dbContext.SaveChanges();
@@ -367,8 +372,10 @@ namespace WebApi.Repository
             Taste customOrderTaste = _bakingbunnyContext.Taste.Where(t => t.Id == customOrder.TasteId).FirstOrDefault();
             CakeType customOrderCakeType = _bakingbunnyContext.CakeType.Where(c => c.Id == customOrder.CakeTypeId).FirstOrDefault();
 
+#if (!DEBUG)
             _mailService.SendEmailToClientCustomAsync(customOrder, customOrderSize, customOrderTaste, customOrderCakeType);
             _mailService.SendInternalEmailCustomAsync(customOrder, customOrderSize, customOrderTaste, customOrderCakeType);
+#endif
         }
 
         public int CalculateDeliveryFee(string postalCode)
@@ -418,7 +425,7 @@ namespace WebApi.Repository
             return deliveryFee;
         }
 
-        private int GetDistance (string postalCode)
+        private int GetDistance(string postalCode)
         {
 #if (DEBUG)
             //postalCode = "T2Y3E4";
@@ -441,7 +448,7 @@ namespace WebApi.Repository
                     {
                         string jsonResponse = reader.ReadToEnd();
                         JToken destination = JObject.Parse(jsonResponse) ["destination_addresses"] [0];
-                        
+
                         //if (!destination.HasValues)
                         if (destination == null)
                             return -1;
@@ -454,7 +461,7 @@ namespace WebApi.Repository
             return distance;
         }
 
-        private Delivery FindDeliveryFee (string postalCode)
+        private Delivery FindDeliveryFee(string postalCode)
         {
             return _bakingbunnyContext.Delivery.Where(d => d.PostalCode.Equals(postalCode)).FirstOrDefault();
         }

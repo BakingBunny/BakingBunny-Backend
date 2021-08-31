@@ -84,18 +84,23 @@ namespace WebApi
                 app.UseDeveloperExceptionPage();
                 configBuilder.AddUserSecrets<UserSecretConfig>();
             }
-
-            app.UseExceptionHandler(a => a.Run(async context =>
+            else
             {
-                ///////////////
-                // Respond back with full error message.
-                // var exceptionHandlerPathFeature = context.Features.Get<IExceptionHandlerPathFeature>();
-                // var exception = exceptionHandlerPathFeature.Error;
-                // await context.Response.WriteAsJsonAsync(new { error = exception.Message });
-                ///////////////
+                app.UseExceptionHandler(a => a.Run(async context =>
+                {
+                    ///////////////
+                    // Respond back with full error message.
+                    // var exceptionHandlerPathFeature = context.Features.Get<IExceptionHandlerPathFeature>();
+                    // var exception = exceptionHandlerPathFeature.Error;
+                    // await context.Response.WriteAsJsonAsync(new { error = exception.Message });
+                    ///////////////
 
-                await context.Response.WriteAsJsonAsync(new { error = "Oops! Something went wrong! Please contact us at bakingbunny.yyc@gmail.com if the problem persists." });
-            }));
+                    await context.Response.WriteAsJsonAsync(new { error = "Oops! Something went wrong! Please contact us at bakingbunny.yyc@gmail.com if the problem persists." });
+                }));
+                app.UseHsts();
+            }
+            app.UseStatusCodePages();
+
 
             app.UseSwagger();
             app.UseSwaggerUI(c =>
