@@ -33,7 +33,7 @@ namespace WebApi.Repository
         {
             ProductDetail productDetail = new ProductDetail();
             Product product = await GetById(Id);
-            List<Taste> tasteList = (List<Taste>)await GetTastes();
+            List<Taste> tasteList = await GetTastes();
             List<Size> sizeList = await GetSizes();
 
             productDetail.ProductId = product.Id;
@@ -323,8 +323,9 @@ namespace WebApi.Repository
                     dbContext.SaveChanges();
                 }
 #if(!DEBUG)
-                _mailService.SendEmailToClientRegularAsync(orderDetail, orderList.Id, GetProducts());
-                _mailService.SendInternalEmailRegularAsync(orderDetail, orderList.Id, GetProducts());
+                List<Product> productList = await GetProducts();
+                _mailService.SendEmailToClientRegularAsync(orderDetail, orderList.Id, productList);
+                _mailService.SendInternalEmailRegularAsync(orderDetail, orderList.Id, productList);
 #endif
             }
         }
