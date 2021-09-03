@@ -29,12 +29,12 @@ namespace WebApi.Repository
             _clientFactory = clientFactory;
         }
 
-        public async Task<ProductDetail> GetProductById(int Id)
+        public ProductDetail GetProductById(int Id)
         {
             ProductDetail productDetail = new ProductDetail();
-            Product product = await GetById(Id);
-            List<Taste> tasteList = await GetTastes();
-            List<Size> sizeList = await GetSizes();
+            Product product = GetById(Id);
+            List<Taste> tasteList = GetTastes();
+            List<Size> sizeList = GetSizes();
 
             productDetail.ProductId = product.Id;
             productDetail.ProductName = product.Name;
@@ -44,7 +44,7 @@ namespace WebApi.Repository
             productDetail.Comment = product.Comment;
 
             // Category
-            productDetail.Category = await GetCategory(product.CategoryId);
+            productDetail.Category = GetCategory(product.CategoryId);
 
             // Taste
             if (product.Id == 3) // Whipped Cream cake
@@ -60,7 +60,7 @@ namespace WebApi.Repository
 
             // CakeType
             if (product.Id == 1) // Custom Cake
-                productDetail.CakeTypeList = await GetCakeTypes();
+                productDetail.CakeTypeList = GetCakeTypes();
             else
                 productDetail.CakeTypeList = new List<CakeType>();
 
@@ -72,12 +72,12 @@ namespace WebApi.Repository
         /// </summary>
         /// <returns>List<ProductDetail></returns>
         //public List<ProductDetail> GetAll()
-        public async Task<List<ProductDetail>> GetAll()
+        public List<ProductDetail> GetAll()
         {
             List<ProductDetail> productDetailList = new List<ProductDetail>();
-            List<Product> productList = await GetProducts();
-            List<Taste> tasteList = await GetTastes();
-            List<Size> sizeList = await GetSizes();
+            List<Product> productList = GetProducts();
+            List<Taste> tasteList = GetTastes();
+            List<Size> sizeList = GetSizes();
 
             ProductDetail productDetail;
             foreach (Product p in productList)
@@ -91,7 +91,7 @@ namespace WebApi.Repository
                 productDetail.Comment = p.Comment;
 
                 // Category
-                 productDetail.Category = await GetCategory(p.CategoryId);
+                 productDetail.Category = GetCategory(p.CategoryId);
 
                 // Taste
                 if (p.Id == 3) // Whipped Cream cake
@@ -107,7 +107,7 @@ namespace WebApi.Repository
 
                 // CakeType
                 if (p.Id == 1) // Custom Cake
-                    productDetail.CakeTypeList = await GetCakeTypes();
+                    productDetail.CakeTypeList = GetCakeTypes();
                 else
                     productDetail.CakeTypeList = new List<CakeType>();
 
@@ -122,12 +122,12 @@ namespace WebApi.Repository
         /// Retrieve only cake list
         /// </summary>
         /// <returns>List<ProductDetail></returns>
-        public async Task<List<ProductDetail>> GetCakes()
+        public List<ProductDetail> GetCakes()
         {
             List<ProductDetail> productDetailList = new List<ProductDetail>();
-            List<Product> productList = await GetProducts();
-            List<Taste> tasteList = await GetTastes();
-            List<Size> sizeList = await GetSizes();
+            List<Product> productList = GetProducts();
+            List<Taste> tasteList = GetTastes();
+            List<Size> sizeList = GetSizes();
 
             ProductDetail productDetail;
             foreach (Product p in productList.Where(p => p.CategoryId == 1).ToList())
@@ -141,7 +141,7 @@ namespace WebApi.Repository
                 productDetail.Comment = p.Comment;
 
                 // Category
-                 productDetail.Category = await GetCategory(p.CategoryId);
+                 productDetail.Category = GetCategory(p.CategoryId);
 
                 // Taste
                 if (p.Id == 3) // Whipped Cream cake
@@ -154,7 +154,7 @@ namespace WebApi.Repository
 
                 // CakeType
                 if (p.Id == 1) // Custom Cake
-                    productDetail.CakeTypeList = await GetCakeTypes();
+                    productDetail.CakeTypeList = GetCakeTypes();
                 else
                     productDetail.CakeTypeList = new List<CakeType>();
 
@@ -169,12 +169,12 @@ namespace WebApi.Repository
         /// Retrieve only dacquoise list
         /// </summary>
         /// <returns>List<ProductDetail></returns>
-        public async Task<List<ProductDetail>> GetDacquoises()
+        public List<ProductDetail> GetDacquoises()
         {
             List<ProductDetail> productDetailList = new List<ProductDetail>();
-            List<Product> productList = await GetProducts();
-            List<Taste> tasteList = await GetTastes();
-            List<Size> sizeList = await GetSizes();
+            List<Product> productList = GetProducts();
+            List<Taste> tasteList = GetTastes();
+            List<Size> sizeList = GetSizes();
 
             ProductDetail productDetail;
             foreach (Product p in productList.Where(p => p.CategoryId == 2).ToList())
@@ -188,7 +188,7 @@ namespace WebApi.Repository
                 productDetail.Comment = p.Comment;
 
                 // Category
-                productDetail.Category = await GetCategory(p.CategoryId);
+                productDetail.Category = GetCategory(p.CategoryId);
 
                 // Taste
                 productDetail.TasteList = new List<Taste>();
@@ -207,54 +207,54 @@ namespace WebApi.Repository
         /// Retrieve all sizes
         /// </summary>
         /// <returns>List<Size></returns>
-        private async Task<List<Size>> GetSizes()
+        private List<Size> GetSizes()
         {
-            return await _bakingbunnyContext.Size.ToListAsync();
+            return _bakingbunnyContext.Size.ToList();
         }
 
         /// <summary>
         /// Retrieve all fruits
         /// </summary>
         /// <returns>List<Fruit></returns>
-        private async Task<List<Taste>> GetTastes()
+        private List<Taste> GetTastes()
         {
-            return await _bakingbunnyContext.Taste.ToListAsync();
+            return _bakingbunnyContext.Taste.ToList();
         }
 
         /// <summary>
         /// Retrieve all cake types
         /// </summary>
         /// <returns>List<CakeType></returns>
-        private async Task <List<CakeType>> GetCakeTypes()
+        private List<CakeType> GetCakeTypes()
         {
-            return await _bakingbunnyContext.CakeType.ToListAsync();
+            return _bakingbunnyContext.CakeType.ToList();
         }
 
         /// <summary>
         /// Retrieve corresponding category object
         /// </summary>
         /// <returns>Category</returns>
-        private async Task<Category> GetCategory(int id)
+        private Category GetCategory(int id)
         {
-            return await _bakingbunnyContext.Category.Where(c => c.Id == id).FirstOrDefaultAsync();
+            return _bakingbunnyContext.Category.Where(c => c.Id == id).FirstOrDefault();
         }
 
         /// <summary>
         /// Retrieve a Product object by Id
         /// </summary>
         /// <returns>Product</returns>
-        private async Task<Product> GetById(int Id)
+        private Product GetById(int Id)
         {
-            return await _bakingbunnyContext.Product.Where(s => s.Active).Where(p => p.Id == Id).FirstOrDefaultAsync();
+            return _bakingbunnyContext.Product.Where(s => s.Active).Where(p => p.Id == Id).FirstOrDefault();
         }
 
         /// <summary>
         /// Just for email method to provide product data.
         /// </summary>
         /// <returns>List<Product></returns>
-        private async Task<List<Product>> GetProducts()
+        private List<Product> GetProducts()
         {
-            return await _bakingbunnyContext.Product.Where(s => s.Active).ToListAsync();
+            return _bakingbunnyContext.Product.Where(s => s.Active).ToList();
         }
 
         /// <summary>
@@ -323,9 +323,8 @@ namespace WebApi.Repository
                     dbContext.SaveChanges();
                 }
 #if(!DEBUG)
-                List<Product> productList = await GetProducts();
-                _mailService.SendEmailToClientRegularAsync(orderDetail, orderList.Id, productList);
-                _mailService.SendInternalEmailRegularAsync(orderDetail, orderList.Id, productList);
+                _mailService.SendEmailToClientRegularAsync(orderDetail, orderList.Id, GetProducts());
+                _mailService.SendInternalEmailRegularAsync(orderDetail, orderList.Id, GetProducts());
 #endif
             }
         }

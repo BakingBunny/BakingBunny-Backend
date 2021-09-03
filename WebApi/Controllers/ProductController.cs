@@ -29,12 +29,11 @@ namespace WebApiCrud.Controllers
 
         [Route("api/[controller]")]
         [HttpGet]
-        //public List<ProductDetail> GetAll()
-        public async Task<IActionResult> GetAll()
+        public IActionResult GetAll()
         {
             try
             {
-                return Ok(await _productRepository.GetAll());
+                return Ok(_productRepository.GetAll());
             }
             catch (Exception ex)
             {
@@ -44,11 +43,11 @@ namespace WebApiCrud.Controllers
         }
 
         [HttpGet("api/[controller]/{id}")]
-        public async Task<IActionResult> GetProductById(int Id)
+        public IActionResult GetProductById(int Id)
         {
             try
             {
-                return Ok(await _productRepository.GetProductById(Id));
+                return Ok(_productRepository.GetProductById(Id));
             }
             catch (Exception ex)
             {
@@ -58,11 +57,11 @@ namespace WebApiCrud.Controllers
         }
 
         [HttpGet("api/category/cakes")]
-        public async Task<IActionResult> GetCakes()
+        public IActionResult GetCakes()
         {
             try
             {
-                return Ok(await _productRepository.GetCakes());
+                return Ok(_productRepository.GetCakes());
             }
             catch (Exception ex)
             {
@@ -72,11 +71,11 @@ namespace WebApiCrud.Controllers
         }
 
         [HttpGet("api/category/dacquoises")]
-        public async Task<IActionResult> GetDacquoises()
+        public IActionResult GetDacquoises()
         {
             try
             {
-                return Ok(await _productRepository.GetDacquoises());
+                return Ok(_productRepository.GetDacquoises());
             }
             catch (Exception ex)
             {
