@@ -314,8 +314,8 @@ namespace WebApi.Repository
                     {
                         Quantity = saleItem.Quantity,
                         Discount = 0,
-                        TasteId = saleItem.TasteId < 1 ? 1 : saleItem.TasteId,
-                        SizeId = saleItem.SizeId < 1 ? 1 : saleItem.SizeId,
+                        TasteId = saleItem.TasteId < 1 ? saleItem.TasteId = 1 : saleItem.TasteId,
+                        SizeId = saleItem.SizeId < 1 ? saleItem.SizeId = 1 : saleItem.SizeId,
                         OrderListId = orderList.Id,
                         ProductId = saleItem.ProductId,
                     });
@@ -360,9 +360,9 @@ namespace WebApi.Repository
                     RequestDate = targetDateTime,
                     Delivery = customOrder.Delivery,
                     UserId = user.Id,
-                    TasteId = customOrder.TasteId < 1 ? 1 : customOrder.TasteId,
-                    SizeId = customOrder.SizeId < 1 ? 1 : customOrder.SizeId,
-                    CakeTypeId = customOrder.CakeTypeId < 1 ? 1 : customOrder.CakeTypeId,
+                    TasteId = customOrder.TasteId < 1 ? customOrder.TasteId = 1 : customOrder.TasteId,
+                    SizeId = customOrder.SizeId < 1 ? customOrder.SizeId = 1 : customOrder.SizeId,
+                    CakeTypeId = customOrder.CakeTypeId < 1 ? customOrder.CakeTypeId = 1 : customOrder.CakeTypeId,
                 });
 
                 dbContext.SaveChanges();
