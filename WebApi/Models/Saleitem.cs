@@ -1,27 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 #nullable disable
 
-namespace WebApiCrud.Models
+namespace WebApi.Models
 {
-    public partial class Saleitem
+    public partial class SaleItem
     {
-        public Saleitem()
+        public SaleItem()
         {
-            Orderlists = new HashSet<Orderlist>();
         }
 
         public int Id { get; set; }
+        [Required]
         public int Quantity { get; set; }
         public float? Discount { get; set; }
+        [Required]
         public int ProductId { get; set; }
+        [Required]
         public int SizeId { get; set; }
-        public int FruitId { get; set; }
-
-        public virtual Fruit Fruit { get; set; }
-        public virtual Product Product { get; set; }
-        public virtual Size Size { get; set; }
-        public virtual ICollection<Orderlist> Orderlists { get; set; }
+        [Required]
+        public int TasteId { get; set; }
+        public int OrderListId { get; set; }
     }
 }
